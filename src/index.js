@@ -8,7 +8,7 @@ const args = process.argv.slice(2)
 const output = args[1] || "output.json"
 const getRedirects = args[2] === "true" || false
 const debug = args[3] === "true" || false
-if (debug) {const start = new Date()}
+const start = new Date()
 
 fetch(`https://news.google.com/search?q=${args[0]}`).then(res => res.text()).then(data => {
     const $ = cheerio.load(data)
@@ -46,9 +46,9 @@ fetch(`https://news.google.com/search?q=${args[0]}`).then(res => res.text()).the
             return console.log(err)
         }
         console.log(`File written to ${output}`)
+        if (debug) {
+            const end = new Date()
+            console.log(`Executed in ${(end.getTime() - start.getTime()) / 1000} seconds`)
+        }
     })
-    if (debug) {
-        const end = new Date()
-        console.log(`Executed in ${(end.getTime() - start.getTime()) / 1000} seconds`)
-    }
 })
