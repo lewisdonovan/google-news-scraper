@@ -1,5 +1,5 @@
 {
-  "name": "sme-news-scraper",
+  "name": "google-news-scraper",
   "version": "1.0.0",
   "description": "Lightweight promise-based scraper for Google News",
   "main": "index.js",
