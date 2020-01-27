@@ -1,0 +1,30 @@
+{
+  "name": "sme-news-scraper",
+  "version": "1.0.0",
+  "description": "Lightweight promise-based scraper for Google News",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lewisdonovan/google-news-scraper"
+  },
+  "keywords": [
+    "news",
+    "scraper",
+    "google",
+    "google news",
+    "news scraper",
+    "crawler",
+    "web crawler",
+    "news crawler",
+    "google crawler"
+  ],
+  "author": "Lewis Donovan",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
+    "node-fetch": "^2.6.0"
+  }
+}
