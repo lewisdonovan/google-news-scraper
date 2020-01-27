@@ -2,12 +2,12 @@
 # Google News Scraper
 A lightweight command-line tool that scrapes article data from Google News. Simply pass a keyword or phrase as a command-line argument, and the results are written to a local JSON file.
 
-* [Installation](https://github.com/lewisdonovan/google-news-scraper#installation)
-* [Usage](https://github.com/lewisdonovan/google-news-scraper#usage)
-* [URLs](https://github.com/lewisdonovan/google-news-scraper#urls)
-* [Output format](https://github.com/lewisdonovan/google-news-scraper#outputformat)
-* [Performance](https://github.com/lewisdonovan/google-news-scraper#performance)
-* [Contribute](https://github.com/lewisdonovan/google-news-scraper#contribute)
+* [Installation](#installation)
+* [Usage](#usage)
+* [URLs](#urls)
+* [Output format](#outputformat)
+* [Performance](#performance)
+* [Contribute](#contribute)
 
 ## Installation
 ```console
