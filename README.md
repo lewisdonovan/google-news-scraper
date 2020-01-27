@@ -2,6 +2,13 @@
 # Google News Scraper
 A lightweight command-line tool that scrapes article data from Google News. Simply pass a keyword or phrase as a command-line argument, and the results are written to a local JSON file.
 
+* [Installation](https://github.com/lewisdonovan/google-news-scraper#installation)
+* [Usage](https://github.com/lewisdonovan/google-news-scraper#usage)
+* [URLs](https://github.com/lewisdonovan/google-news-scraper#urls)
+* [Output format](https://github.com/lewisdonovan/google-news-scraper#outputformat)
+* [Performance](https://github.com/lewisdonovan/google-news-scraper#performance)
+* [Contribute](https://github.com/lewisdonovan/google-news-scraper#contribute)
+
 ## Installation
 ```console
 # Clone the repo
@@ -12,10 +19,36 @@ cd google-news-scraper
 
 # Install the dependencies:
 npm install
+```
 
-# Run your search query:
+## Usage
+The scraper accepts three arguments: "search term", "output filename", and "pretty URLs" (which are explained in more detail [below](https://github.com/lewisdonovan/google-news-scraper#urls))
+They take the following format:
+
+```console
+node index.js [STRING] [STRING] [BOOLEAN]
+```
+At a minimum, you must include a search term:
+```console
+# Search for news stories about The Oscars:
 node index.js "The Oscars"
 ```
+
+The other arguments are optional and can be used like so:
+```console
+# Give a custom filename of "oscars-news.json"
+node index.js "The Oscars" "oscars-news.json"
+
+# Follow redirects and retrieve "pretty" URLs
+node index.js "The Oscars" "oscars-news.json" true
+```
+
+## URLs
+The URLs that Google News supplies for each article are "ugly" redirect links (eg: `"https://news.google.com/articles/CAIiEPgfWP_e7PfrSwLwvWeb5msqFwgEKg8IACoHCAowjuuKAzCWrzwwt4QY?hl=en-GB&gl=GB&ceid=GB%3Aen"`).
+
+You can optionally ask the scraper to follow the redirect and retrieve the actual "pretty" URL (eg: `"https://www.nytimes.com/2020/01/22/movies/expanded-best-picture-oscar.html"`).
+
+As you can imagine, this results in lots of additional HTTP requests, which negatively impact the scraper's performance. [In testing](https://github.com/lewisdonovan/google-news-scraper#performance), following redirects took around five times longer on average.
 
 ## Output format
 The output is a JSON array, with each article following the structure below:
@@ -30,14 +63,6 @@ The output is a JSON array, with each article following the structure below:
     "time":  "Time/date published (human-readable)"  // String
 }
 ```
-
-## Arguments
-The scraper accepts three arguments:
-1. The search term (which should be wrapped in quotes, eg: `"The Oscars"`)
-2. The desired output file (which should be wrapped in quotes, eg: `"oscars-news.json"`) relative to the repo root. If this is omitted, the default will be `"output.json"`.
-2. and a Boolean that defines whether or not the scraper will follow redirects.
-	* If set to `false` (or omitted), the scraper won't follow redirects, and will return Google News URLs (eg: `"https://news.google.com/articles/CAIiEPgfWP_e7PfrSwLwvWeb5msqFwgEKg8IACoHCAowjuuKAzCWrzwwt4QY?hl=en-GB&gl=GB&ceid=GB%3Aen"`).
-	* If set to `true`, the scraper will follow the redirect and return the final URL (eg: `"https://www.nytimes.com/2020/01/22/movies/expanded-best-picture-oscar.html"`). This results in lots of additional HTTP requests, so makes the scraper takes roughly five times longer.
 
 ## Performance
 My test query returned 104 results, which took 1.566 seconds without redirects, and 7.36 seconds with redirects. I'm on a fibre connection, and other queries may return a different number of results, so your mileage may vary. 
