@@ -55,12 +55,12 @@ The output is a JSON array, with each article following the structure below:
 
 ```json
 {
-    "title":  "Article title",  // String
-    "subtitle":  "Article subtitle/excerpt",  // String
-    "link":  "http://url-to-website.com/path/to/article",  // String
-    "image":"http://url-to-website.com/path/to/image.jpg",  // String
-    "source":  "Name of publication",  // String
-    "time":  "Time/date published (human-readable)"  // String
+    "title":  "Article title",
+    "subtitle":  "Article subtitle",
+    "link":  "http://url-to-website.com/path/to/article",
+    "image":"http://url-to-website.com/path/to/image.jpg",
+    "source":  "Name of publication",
+    "time":  "Time/date published (human-readable)"
 }
 ```
 
