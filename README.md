@@ -1,70 +1,40 @@
 
-  
-
 # Google News Scraper
-
-  
-
-A lightweight command-line tool that scrapes article data from Google News. Simply pass a keyword or phrase as a command-line argument, and the results are outputted in a JSON file.
-
-  
+A lightweight command-line tool that scrapes article data from Google News. Simply pass a keyword or phrase as a command-line argument, and the results are written to a local JSON file.
 
 ## Installation
-
 ```console
-
 # Clone the repo
-
 git clone https://github.com/lewisdonovan/google-news-scraper
 
-  
-
 # Enter the repo directory
-
 cd google-news-scraper
 
-  
-
 # Install the dependencies:
-
 npm install
 
-  
-
 # Run your search query:
-
 node index.js "The Oscars"
-
 ```
 
 ## Output format
-
 The output is a JSON array, with each article following the structure below:
 
 ```json
-
 {
-
-"title":  "Article title",  // String
-
-"subtitle":  "Article subtitle/excerpt",  // String
-
-"link":  "http://url-to-website.com/path/to/article",  // String
-
-"image":"http://url-to-website.com/path/to/image.jpg",  // String
-
-"source":  "Name of publication",  // String
-
-"time":  "Time/date published (human-readable)"  // String
-
+    "title":  "Article title",  // String
+    "subtitle":  "Article subtitle/excerpt",  // String
+    "link":  "http://url-to-website.com/path/to/article",  // String
+    "image":"http://url-to-website.com/path/to/image.jpg",  // String
+    "source":  "Name of publication",  // String
+    "time":  "Time/date published (human-readable)"  // String
 }
-
 ```
 
 ## Arguments
-
-The scraper accepts two arguments:
-1. The search term, which should be wrapped in quotes (eg: `"My local news"`)
+The scraper accepts three arguments:
+1. The search term (which should be wrapped in quotes, eg: `"The Oscars"`)
+2. The desired output file (which should be wrapped in quotes, eg: `"oscars-news.json"`) relative to the repo root. If this is omitted, the default will be `"output.json"`.
 2. and a Boolean that defines whether or not the scraper will follow redirects.
 	* If set to `false` (or omitted), the scraper won't follow redirects, and will return Google News URLs (eg: `"https://news.google.com/articles/CAIiEPgfWP_e7PfrSwLwvWeb5msqFwgEKg8IACoHCAowjuuKAzCWrzwwt4QY?hl=en-GB&gl=GB&ceid=GB%3Aen"`).
 	* If set to `true`, the scraper will follow the redirect and return the final URL (eg: `"https://www.nytimes.com/2020/01/22/movies/expanded-best-picture-oscar.html"`). This results in lots of additional HTTP requests, so makes the scraper takes roughly five times longer.
