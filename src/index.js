@@ -27,8 +27,6 @@ fetch(`https://news.google.com/search?q=${args[0]}`).then(res => res.text()).the
         })
         i++
     })
-    return results
-}).then(results => {
     if (getRedirects) {
         return Promise.all(results.map(article => {
             return fetch(article.link).then(res => res.text()).then(data => {
