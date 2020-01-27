@@ -4,8 +4,8 @@ A lightweight command-line tool that scrapes article data from Google News. Simp
 
 * [Installation](#installation)
 * [Usage](#usage)
-* [URLs](#urls)
-* [Output format](#outputformat)
+* [URLs](#pretty-urls)
+* [Output format](#output-format)
 * [Performance](#performance)
 * [Contribute](#contribute)
 
@@ -22,7 +22,7 @@ npm install
 ```
 
 ## Usage
-The scraper accepts three arguments: "search term", "output filename", and "pretty URLs" (which are explained in more detail [below](https://github.com/lewisdonovan/google-news-scraper#urls))
+The scraper accepts three arguments: "search term", "output filename", and "pretty URLs" (which are explained in more detail [below](#pretty-urls))
 They take the following format:
 
 ```console
@@ -43,7 +43,7 @@ node index.js "The Oscars" "oscars-news.json"
 node index.js "The Oscars" "oscars-news.json" true
 ```
 
-## URLs
+## Pretty URLs
 The URLs that Google News supplies for each article are "ugly" redirect links (eg: `"https://news.google.com/articles/CAIiEPgfWP_e7PfrSwLwvWeb5msqFwgEKg8IACoHCAowjuuKAzCWrzwwt4QY?hl=en-GB&gl=GB&ceid=GB%3Aen"`).
 
 You can optionally ask the scraper to follow the redirect and retrieve the actual "pretty" URL (eg: `"https://www.nytimes.com/2020/01/22/movies/expanded-best-picture-oscar.html"`).
