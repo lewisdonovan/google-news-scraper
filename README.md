@@ -22,11 +22,11 @@ npm install
 ```
 
 ## Usage
-The scraper accepts three arguments: "search term", "output filename", and "pretty URLs" (which are explained in more detail [below](#pretty-urls))
+The scraper accepts four arguments: "search term", "output filename", ["pretty URLs"](#pretty-urls) and [timeframe](#timeframe)
 They take the following format:
 
 ```console
-node index.js [STRING] [STRING] [BOOLEAN]
+node index.js [STRING] [STRING] [BOOLEAN] [STRING]
 ```
 At a minimum, you must include a search term:
 ```console
@@ -41,6 +41,9 @@ node index.js "The Oscars" "oscars-news.json"
 
 # Follow redirects and retrieve "pretty" URLs
 node index.js "The Oscars" "oscars-news.json" true
+
+# Set a custom timeframe of 5 days
+node index.js "The Oscars" "oscars-news.json" true "5d"
 ```
 
 ## Pretty URLs
@@ -49,6 +52,15 @@ The URLs that Google News supplies for each article are "ugly" redirect links (e
 You can optionally ask the scraper to follow the redirect and retrieve the actual "pretty" URL (eg: `"https://www.nytimes.com/2020/01/22/movies/expanded-best-picture-oscar.html"`).
 
 As you can imagine, this results in lots of additional HTTP requests, which negatively impact the scraper's performance. [In testing](https://github.com/lewisdonovan/google-news-scraper#performance), following redirects took around five times longer on average.
+
+## Timeframe
+The results can be filtered to articles published within a given timeframe prior to the requesst. The default is 30 days.
+
+The format of the timeframe is a string comprised of a number, followed by a letter prepresenting the time operator. For example `1y` would signify 1 year. Full list of operators below:
+* h = hours (eg: `12h`)
+* d = days (eg: `7d`)
+* m = months (eg: `6m`)
+* y = years (eg: `1y`)
 
 ## Output format
 The output is a JSON array, with each article following the structure below:
