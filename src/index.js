@@ -7,10 +7,11 @@ const args = process.argv.slice(2)
 
 const output = args[1] || "output.json"
 const getRedirects = args[2] === "true" || false
-const debug = args[3] === "true" || false
+const timeframe = args[3] || '30d'
+const debug = args[4] === "true" || false
 const start = new Date()
 
-fetch(`https://news.google.com/search?q=${args[0]}`).then(res => res.text()).then(data => {
+fetch(`https://news.google.com/search?q=${args[0]} when:${timeframe}`).then(res => res.text()).then(data => {
     const $ = cheerio.load(data)
     const imgs = $('c-wiz img')
     const articles = $('c-wiz article')
