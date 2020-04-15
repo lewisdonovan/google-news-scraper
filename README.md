@@ -10,7 +10,7 @@ A lightweight command-line tool that scrapes article data from Google News. Simp
 * [Contribute](#contribute)
 
 ## Installation
-```console
+```bash
 # Clone the repo
 git clone https://github.com/lewisdonovan/google-news-scraper
 
@@ -25,17 +25,17 @@ npm install
 The scraper accepts four arguments: "search term", "output filename", ["pretty URLs"](#pretty-urls) and [timeframe](#timeframe)
 They take the following format:
 
-```console
+```bash
 node index.js [STRING] [STRING] [BOOLEAN] [STRING]
 ```
 At a minimum, you must include a search term:
-```console
+```bash
 # Search for news stories about The Oscars:
 node index.js "The Oscars"
 ```
 
 The other arguments are optional and can be used like so:
-```console
+```bash
 # Give a custom filename of "oscars-news.json"
 node index.js "The Oscars" "oscars-news.json"
 
