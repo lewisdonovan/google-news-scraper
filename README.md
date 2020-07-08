@@ -1,60 +1,52 @@
 
 # Google News Scraper
-A lightweight command-line tool that scrapes article data from Google News. Simply pass a keyword or phrase as a command-line argument, and the results are written to a local JSON file.
+A lightweight package that scrapes article data from Google News. Simply pass a keyword or phrase, and the results are returned as an array of JSON objects.
 
 * [Installation](#installation)
 * [Usage](#usage)
-* [URLs](#pretty-urls)
-* [Output format](#output-format)
+* [Config](#config)
+* [Output](#output)
 * [Performance](#performance)
 * [Contribute](#contribute)
 
 ## Installation
 ```bash
-# Clone the repo
-git clone https://github.com/lewisdonovan/google-news-scraper
+# Install via NPM
+npm install google-news-scraper
 
-# Enter the repo directory
-cd google-news-scraper
-
-# Install the dependencies:
-npm install
+# Install via Yarn
+yarn add google-news-scraper
 ```
 
 ## Usage
-The scraper accepts four arguments: "search term", "output filename", ["pretty URLs"](#pretty-urls) and [timeframe](#timeframe)
-They take the following format:
+```javascript
+// Require the package
+const googleNewsScraper = require('google-news-scraper')
 
-```bash
-node index.js [STRING] [STRING] [BOOLEAN] [STRING]
-```
-At a minimum, you must include a search term:
-```bash
-# Search for news stories about The Oscars:
-node index.js "The Oscars"
-```
+// Execute within an async function, pass a config object (further documentation below)
+const articles = await googleNewsScraper({
+    searchTerm: "The Oscars",
+    prettyURLs: false,
+    timeframe: "5d"
+})
 
-The other arguments are optional and can be used like so:
-```bash
-# Give a custom filename of "oscars-news.json"
-node index.js "The Oscars" "oscars-news.json"
-
-# Follow redirects and retrieve "pretty" URLs
-node index.js "The Oscars" "oscars-news.json" true
-
-# Set a custom timeframe of 5 days
-node index.js "The Oscars" "oscars-news.json" true "5d"
 ```
 
-## Pretty URLs
+## Config
+The config object passed to the function above has the following properties:
+
+### Search Term (required)
+This is the search query you'd like to find articles for.
+
+### Pretty URLs (required)
 The URLs that Google News supplies for each article are "ugly" redirect links (eg: `"https://news.google.com/articles/CAIiEPgfWP_e7PfrSwLwvWeb5msqFwgEKg8IACoHCAowjuuKAzCWrzwwt4QY?hl=en-GB&gl=GB&ceid=GB%3Aen"`).
 
 You can optionally ask the scraper to follow the redirect and retrieve the actual "pretty" URL (eg: `"https://www.nytimes.com/2020/01/22/movies/expanded-best-picture-oscar.html"`).
 
 As you can imagine, this results in lots of additional HTTP requests, which negatively impact the scraper's performance. [In testing](https://github.com/lewisdonovan/google-news-scraper#performance), following redirects took around five times longer on average.
 
-## Timeframe
-The results can be filtered to articles published within a given timeframe prior to the requesst. The default is 30 days.
+### Timeframe
+The results can be filtered to articles published within a given timeframe prior to the requesst. The default is 7 days.
 
 The format of the timeframe is a string comprised of a number, followed by a letter prepresenting the time operator. For example `1y` would signify 1 year. Full list of operators below:
 * h = hours (eg: `12h`)
@@ -62,18 +54,22 @@ The format of the timeframe is a string comprised of a number, followed by a let
 * m = months (eg: `6m`)
 * y = years (eg: `1y`)
 
-## Output format
-The output is a JSON array, with each article following the structure below:
+## Output
+The output is an array of JSON objects, with each article following the structure below:
 
 ```json
-{
-    "title":  "Article title",
-    "subtitle":  "Article subtitle",
-    "link":  "http://url-to-website.com/path/to/article",
-    "image":"http://url-to-website.com/path/to/image.jpg",
-    "source":  "Name of publication",
-    "time":  "Time/date published (human-readable)"
-}
+[
+    {
+        "title":  "Article title",
+        "subtitle":  "Article subtitle",
+        "link":  "http://url-to-website.com/path/to/article",
+        "image":"http://url-to-website.com/path/to/image.jpg",
+        "source":  "Name of publication",
+        "time":  "Time/date published (human-readable)"
+    }, {
+        ...
+    }
+]
 ```
 
 ## Performance

@@ -1,7 +1,7 @@
 {
   "name": "google-news-scraper",
-  "version": "1.0.0",
-  "description": "Lightweight promise-based scraper for Google News",
+  "version": "1.0.4",
+  "description": "Lightweight async scraper for Google News",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -22,7 +22,7 @@
     "google crawler"
   ],
   "author": "Lewis Donovan",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
     "node-fetch": "^2.6.0",
