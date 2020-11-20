@@ -6,7 +6,11 @@ const fetch = require('node-fetch')
 
 module.exports = async config => {
   const url = `https://news.google.com/search?q=${config.searchTerm} when:${config.timeframe || '7d'}`
-  const browser = await puppeteer.launch({headless:true})
+  const puppeteerConfig = {
+    headless:true,
+    args: config.puppeteerArgs || []
+  }
+  const browser = await puppeteer.launch(puppeteerConfig)
   const page = await browser.newPage()
   page.setViewport({ width: 1366, height: 768 })
   page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36')
