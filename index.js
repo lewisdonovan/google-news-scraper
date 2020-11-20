@@ -7,8 +7,8 @@ const fetch = require('node-fetch')
 module.exports = async config => {
   const url = `https://news.google.com/search?q=${config.searchTerm} when:${config.timeframe || '7d'}`
   const puppeteerConfig = {
-    headless:true,
-    args: config.puppeteerArgs || []
+    headless: true,
+    args: puppeteer.defaultArgs().concat(config.puppeteerArgs).filter(Boolean)
   }
   const browser = await puppeteer.launch(puppeteerConfig)
   const page = await browser.newPage()
