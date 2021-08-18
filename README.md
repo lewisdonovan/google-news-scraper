@@ -28,6 +28,11 @@ const googleNewsScraper = require('google-news-scraper')
 const articles = await googleNewsScraper({
     searchTerm: "The Oscars",
     prettyURLs: false,
+    queryVars: {
+        hl:"en-US",
+        gl:"US",
+        ceid:"US:en"
+      },
     timeframe: "5d",
     puppeteerArgs: []
 })
@@ -39,6 +44,9 @@ The config object passed to the function above has the following properties:
 
 ### Search Term (required)
 This is the search query you'd like to find articles for.
+
+### Search Term (optional)
+Additional query params to add to the URL.
 
 ### Pretty URLs (required)
 The URLs that Google News supplies for each article are "ugly" redirect links (eg: `"https://news.google.com/articles/CAIiEPgfWP_e7PfrSwLwvWeb5msqFwgEKg8IACoHCAowjuuKAzCWrzwwt4QY?hl=en-GB&gl=GB&ceid=GB%3Aen"`).
