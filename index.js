@@ -3,9 +3,12 @@
 const puppeteer = require('puppeteer')
 const cheerio = require('cheerio')
 const fetch = require('node-fetch')
+const buildQueryString = require('./buildQueryString')
 
 module.exports = async config => {
-  const url = `https://news.google.com/search?q=${config.searchTerm} when:${config.timeframe || '7d'}`
+  const queryString = config.queryVars ? buildQueryString(config.queryVars) : ''
+  const url = `https://news.google.com/search?${queryString}&q=${config.searchTerm} when:${config.timeframe || '7d'}`
+  console.log(`SCRAPING NEWS FROM: ${url}`)
   const puppeteerConfig = {
     headless: true,
     args: puppeteer.defaultArgs().concat(config.puppeteerArgs).filter(Boolean)
