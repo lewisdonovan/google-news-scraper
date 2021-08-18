@@ -4,7 +4,7 @@
   "description": "Lightweight async scraper for Google News",
   "main": "index.js",
   "scripts": {
-    "test": "node test.js"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -27,5 +27,9 @@
     "cheerio": "^1.0.0-rc.3",
     "node-fetch": "^2.6.0",
     "puppeteer": "^3.2.0"
+  },
+  "devDependencies": {
+    "expect.js": "^0.3.1",
+    "jest": "^27.0.6"
   }
 }

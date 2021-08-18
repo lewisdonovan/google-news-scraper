@@ -8,7 +8,7 @@ const buildQueryString = require('./buildQueryString')
 module.exports = async config => {
   const queryString = config.queryVars ? buildQueryString(config.queryVars) : ''
   const url = `https://news.google.com/search?${queryString}&q=${config.searchTerm} when:${config.timeframe || '7d'}`
-  console.log(`SCRAPING NEWS FROM: ${url}`)
+  //console.log(`SCRAPING NEWS FROM: ${url}`)
   const puppeteerConfig = {
     headless: true,
     args: puppeteer.defaultArgs().concat(config.puppeteerArgs).filter(Boolean)
