@@ -45,7 +45,7 @@ The config object passed to the function above has the following properties:
 ### Search Term (required)
 This is the search query you'd like to find articles for.
 
-### Search Term (optional)
+### Query Vars (optional)
 Additional query params to add to the URL.
 
 ### Pretty URLs (required)
