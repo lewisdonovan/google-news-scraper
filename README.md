@@ -61,7 +61,7 @@ The results can be filtered to articles published within a given timeframe prior
 ### Puppeteer Arguments (optional)
 An array of Chromium flags to pass to the browser instance. By default, this will be an empty array.
 A full list of available flags can be found [here](https://peter.sh/experiments/chromium-command-line-switches/).
-NB: if you are launching this in a Heroku app, you will need to pass the '--no-sandbox' and '--disable-setuid-sandbox' flags, as explained in [this SO answer](https://stackoverflow.com/a/52228855/7546845)
+NB: if you are launching this in a Heroku app, you will need to pass the `--no-sandbox` and `--disable-setuid-sandbox` flags, as explained in [this SO answer](https://stackoverflow.com/a/52228855/7546845).
 
 The format of the timeframe is a string comprised of a number, followed by a letter prepresenting the time operator. For example `1y` would signify 1 year. Full list of operators below:
 * h = hours (eg: `12h`)
@@ -81,8 +81,6 @@ The output is an array of JSON objects, with each article following the structur
         "image":"http://url-to-website.com/path/to/image.jpg",
         "source":  "Name of publication",
         "time":  "Time/date published (human-readable)"
-    }, {
-        ...
     }
 ]
 ```
@@ -91,7 +89,7 @@ The output is an array of JSON objects, with each article following the structur
 My test query returned 104 results, which took 1.566 seconds without redirects, and 7.36 seconds with redirects. I'm on a fibre connection, and other queries may return a different number of results, so your mileage may vary. 
 
 ## Upkeep
-Please note that this is a web-scraper, which relies on DOM selectors, so any fundamental changes in the markup on the Google News site will probably break this tool. I'll try my best to keep it up-to-date, but many of these changes will be silent. Feel free to submit an issue if it stops working.
+Please note that this is a web-scraper, which relies on DOM selectors, so any fundamental changes in the markup on the Google News site will probably break this tool. I'll try my best to keep it up-to-date, but changes to the markup on Google News will be silent and therefore difficult to keep track of. Feel free to submit an issue if the tool stops working.
 
 ## Issues
 Please report bugs via the [issue tracker](https://github.com/lewisdonovan/google-news-scraper/issues).
