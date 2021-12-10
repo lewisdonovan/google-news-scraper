@@ -31,47 +31,44 @@ module.exports = async config => {
     headers['Referer'] = 'https://www.google.com/'
     request.continue({ headers })
   })
+  await page.setCookie({
+    name: "CONSENT",
+    value: `YES+cb.${new Date().toISOString().split('T')[0].replaceAll('-','')}-04-p0.en-GB+FX+667`,
+    domain: ".google.com"
+  });
   await page.goto(url, { waitUntil: 'networkidle2' })
   
   const content = await page.content()
   const $ = cheerio.load(content)
-  const imgs = $('c-wiz img')
-  const articles = $('c-wiz article')
+  const articles = $('a[href^="./article"]').closest('div[jslog]')
   let results = []
   let i = 0
+  const urlChecklist = []
 
   $(articles).each(function() {
-    const hasSubArticles = $(this).siblings('div[jsname]').length
-    if (hasSubArticles) {
-      results.push({
-        "title": $(this).find('h3').text() || false,
-        "subtitle": $(this).find('span').first().text() || false,
-        "link": $(this).find('a').first().attr('href').replace('./', 'https://news.google.com/') || false,
-        "image": $(imgs[i]).attr('src') || false,
-        "source": $(this).find('div:last-child a').text() || false,
-        "time": $(this).find('div:last-child time').text() || false
-      })
-      const subArticles = $(this).siblings('div[jsname]').find('article')
-      $(subArticles).each(function() {
-        results.push({
+    const link = $(this).find('a[href^="./article"]').attr('href').replace('./', 'https://news.google.com/') || false
+    link && urlChecklist.push(link)
+    const mainArticle = {
+      "title": $(this).find('h3').text() || false,
+      "link": link,
+      "image": $(this).find('figure').find('img').attr('src') || false,
+      "source": $(this).find('div:last-child svg+a').text() || false,
+      "time": $(this).find('div:last-child time').text() || false,
+      "related": []
+    }
+    const subArticles = $(this).find('div[jsname]').find('article')
+    $(subArticles).each(function() {
+      const subLink = $(this).find('a').first().attr('href').replace('./', 'https://news.google.com/') || false
+      if (subLink && !urlChecklist.includes(subLink)) {
+        mainArticle.related.push({
           "title": $(this).find('h4').text() || $(this).find('h4 a').text() || false,
-          "subtitle": $(this).find('span').first().text() || false,
-          "link": $(this).find('a').first().attr('href').replace('./', 'https://news.google.com/') || false,
-          "image": $(imgs[i]).attr('src') || false,
-          "source": $(this).find('div:last-child a').text() || false,
+          "link": subLink,
+          "source": $(this).find('div:last-child svg+a').text() || false,
           "time": $(this).find('div:last-child time').text() || false
         })
-      })
-    } else {
-      results.push({
-        "title": $(this).find('h3').text() || false,
-        "subtitle": $(this).find('span').first().text() || false,
-        "link": $(this).find('a').first().attr('href').replace('./', 'https://news.google.com/') || false,
-        "image": $(imgs[i]).attr('src') || false,
-        "source": $(this).find('div:last-child a').text() || false,
-        "time": $(this).find('div:last-child time').text() || false
-      })
-    }
+      }
+    })
+    results.push(mainArticle)
     i++
   })
 
