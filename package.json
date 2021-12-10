@@ -1,6 +1,6 @@
 {
   "name": "google-news-scraper",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Lightweight async scraper for Google News",
   "main": "index.js",
   "scripts": {
