@@ -3,7 +3,7 @@ const gns = require('../index.js');
 
 test('Should have prettyURLs', async () => {
   const articles = await gns({
-    searchTerm: "xrp",
+    searchTerm: "dogecoin",
     queryVars: {
       hl:"en-US",
       gl:"US",

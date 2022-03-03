@@ -64,6 +64,7 @@ module.exports = async config => {
           "title": $(this).find('h4').text() || $(this).find('h4 a').text() || false,
           "link": subLink,
           "source": $(this).find('div:last-child svg+a').text() || false,
+          "date": new Date($(this).find('div:last-child time').attr('datetime')),
           "time": $(this).find('div:last-child time').text() || false
         })
       }
