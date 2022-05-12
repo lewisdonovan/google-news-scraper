@@ -2,7 +2,7 @@
 
 const puppeteer = require('puppeteer')
 const cheerio = require('cheerio')
-const fetch = require('node-fetch')
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const buildQueryString = require('./buildQueryString')
 
 module.exports = async config => {
