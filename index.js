@@ -1,11 +1,11 @@
 'use strict'
 
-const puppeteer = require('puppeteer')
-const cheerio = require('cheerio')
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-const buildQueryString = require('./buildQueryString')
+import puppeteer from 'puppeteer'
+import cheerio from 'cheerio'
+import fetch from 'node-fetch'
+import buildQueryString from './buildQueryString'
 
-module.exports = async config => {
+export default async (config) => {
     const queryString = config.queryVars ? buildQueryString(config.queryVars) : ''
     const url = `https://news.google.com/search?${queryString}&q=${config.searchTerm} when:${config.timeframe || '7d'}`
         //console.log(`SCRAPING NEWS FROM: ${url}`)

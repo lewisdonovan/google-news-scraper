@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = query => {
+export default (query) => {
 
   // Sanity check
   if (

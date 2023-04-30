@@ -1,5 +1,5 @@
-const expect = require('expect.js');
-const gns = require('../index.js');
+import expect from 'expect.js'
+import gns from '../index.js'
 
 test('Should have articles (with prettyURLs)', async () => {
   const articles = await gns({
