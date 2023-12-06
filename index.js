@@ -1,14 +1,14 @@
 'use strict'
 
-import puppeteer from 'puppeteer'
-import cheerio from 'cheerio'
-import fetch from 'node-fetch'
-import buildQueryString from './buildQueryString'
+const puppeteer = require('puppeteer');
+const cheerio = require('cheerio');
+const fetch = require('node-fetch');
+const buildQueryString = require('./buildQueryString').default;
 
-export default async (config) => {
+const googleNewsScraper = async (config) => {
     const queryString = config.queryVars ? buildQueryString(config.queryVars) : ''
     const url = `https://news.google.com/search?${queryString}&q=${config.searchTerm} when:${config.timeframe || '7d'}`
-        //console.log(`SCRAPING NEWS FROM: ${url}`)
+        console.log(`SCRAPING NEWS FROM: ${url}`)
     const puppeteerConfig = {
         headless: true,
         args: puppeteer.defaultArgs().concat(config.puppeteerArgs).filter(Boolean)
@@ -36,39 +36,40 @@ export default async (config) => {
         value: `YES+cb.${new Date().toISOString().split('T')[0].replace(/-/g,'')}-04-p0.en-GB+FX+667`,
         domain: ".google.com"
     });
-    await page.goto(url, { waitUntil: 'networkidle2' })
+    await page.goto(url, { waitUntil: 'networkidle2' });
 
-    const content = await page.content()
+    try {
+        await page.$(`[aria-label="Reject all"]`);
+        await Promise.all([
+            page.click(`[aria-label="Reject all"]`), 
+            page.waitForNavigation({waitUntil: 'networkidle2'})
+        ]);
+    } catch (err) {
+        console.log("ERROR REJECTING COOKIES:", err);
+    }
+
+    const content = await page.content();
     const $ = cheerio.load(content)
-    const articles = $('a[href^="./article"]').closest('div[jslog]')
+    const articles = $('a[href^="./article"]').closest('article');
     let results = []
     let i = 0
     const urlChecklist = []
 
     $(articles).each(function() {
         const link = $(this).find('a[href^="./article"]').attr('href').replace('./', 'https://news.google.com/') || false
-        link && urlChecklist.push(link)
+        link && urlChecklist.push(link);
+        const srcset = $(this).find('figure').find('img').attr('srcset')?.split(' ');
+        const image = srcset && srcset.length 
+            ? srcset[srcset.length-2] 
+            : $(this).find('figure').find('img').attr('src');
         const mainArticle = {
-            "title": $(this).find('h3').text() || false,
+            "title": $(this).find('h4').text() || false,
             "link": link,
-            "image": $(this).find('figure').find('img').attr('src') || false,
-            "source": $(this).find('div:last-child svg+a').text() || false,
+            "image": image,
+            "source": $(this).find('div[data-n-tid]').text() || false,
             "datetime": new Date($(this).find('div:last-child time').attr('datetime')) || false,
             "time": $(this).find('div:last-child time').text() || false,
-            "related": []
         }
-        const subArticles = $(this).find('div[jsname]').find('article')
-        $(subArticles).each(function() {
-            const subLink = $(this).find('a').first().attr('href').replace('./', 'https://news.google.com/') || false
-            if (subLink && !urlChecklist.includes(subLink)) {
-                mainArticle.related.push({
-                    "title": $(this).find('h4').text() || $(this).find('h4 a').text() || false,
-                    "link": subLink,
-                    "source": $(this).find('div:last-child svg+a').text() || false,
-                    "time": $(this).find('div:last-child time').text() || false
-                })
-            }
-        })
         results.push(mainArticle)
         i++
     })
@@ -89,3 +90,5 @@ export default async (config) => {
     return results.filter(result => result.title)
 
 }
+
+module.exports = googleNewsScraper;
