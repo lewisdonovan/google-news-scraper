@@ -1,6 +1,6 @@
 {
   "name": "google-news-scraper",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Lightweight async scraper for Google News",
   "main": "index.js",
   "scripts": {
@@ -35,5 +35,6 @@
     "babel-jest": "^29.5.0",
     "expect.js": "^0.3.1",
     "jest": "^27.0.6"
-  }
+  }, 
+  "funding": "https://donate.stripe.com/6oE7ue8n57wk4PS7ss"
 }
