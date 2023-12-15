@@ -8,10 +8,14 @@ const buildQueryString = require('./buildQueryString').default;
 const googleNewsScraper = async (config) => {
     const queryString = config.queryVars ? buildQueryString(config.queryVars) : ''
     const url = `https://news.google.com/search?${queryString}&q=${config.searchTerm} when:${config.timeframe || '7d'}`
-        console.log(`SCRAPING NEWS FROM: ${url}`)
+        console.log(`SCRAPING NEWS FROM: ${url}`);
+    const requiredArgs = [
+        '--disable-extensions-except=/path/to/manifest/folder/',
+        '--load-extension=/path/to/manifest/folder/',
+    ];
     const puppeteerConfig = {
         headless: true,
-        args: puppeteer.defaultArgs().concat(config.puppeteerArgs).filter(Boolean)
+        args: puppeteer.defaultArgs().concat(config.puppeteerArgs).filter(Boolean).concat(requiredArgs)
     }
     const browser = await puppeteer.launch(puppeteerConfig)
     const page = await browser.newPage()
@@ -49,8 +53,9 @@ const googleNewsScraper = async (config) => {
     }
 
     const content = await page.content();
-    const $ = cheerio.load(content)
-    const articles = $('a[href^="./article"]').closest('article');
+    const $ = cheerio.load(content);
+
+    const articles = $('article');
     let results = []
     let i = 0
     const urlChecklist = []
@@ -63,7 +68,7 @@ const googleNewsScraper = async (config) => {
             ? srcset[srcset.length-2] 
             : $(this).find('figure').find('img').attr('src');
         const mainArticle = {
-            "title": $(this).find('h4').text() || false,
+            "title": $(this).find('h4').text() || $(this).find('div > div + div > div a').text(),
             "link": link,
             "image": image,
             "source": $(this).find('div[data-n-tid]').text() || false,
