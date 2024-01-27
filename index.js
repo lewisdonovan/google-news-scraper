@@ -70,7 +70,7 @@ const googleNewsScraper = async (config) => {
         const mainArticle = {
             "title": $(this).find('h4').text() || $(this).find('div > div + div > div a').text(),
             "link": link,
-            "image": image,
+            "image": image?.startsWith("/") ? `https://news.google.com${image}` : image,
             "source": $(this).find('div[data-n-tid]').text() || false,
             "datetime": new Date($(this).find('div:last-child time').attr('datetime')) || false,
             "time": $(this).find('div:last-child time').text() || false,
