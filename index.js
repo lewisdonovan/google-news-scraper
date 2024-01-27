@@ -49,7 +49,7 @@ const googleNewsScraper = async (config) => {
             page.waitForNavigation({waitUntil: 'networkidle2'})
         ]);
     } catch (err) {
-        console.log("ERROR REJECTING COOKIES:", err);
+        // console.log("ERROR REJECTING COOKIES:", err);
     }
 
     const content = await page.content();
