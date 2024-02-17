@@ -96,3 +96,6 @@ Please report bugs via the [issue tracker](https://github.com/lewisdonovan/googl
 
 ## Contribute
 Feel free to [submit a PR](https://github.com/lewisdonovan/google-news-scraper/pulls) if you've fixed an open issue. Thank you.
+
+## Python version
+If you're looking for a Python version, there's one [here](https://github.com/morganbarber/python-news-scraper/).
