@@ -1,6 +1,6 @@
 {
   "name": "google-news-scraper",
-  "version": "1.1.5",
+  "version": "1.2.0",
   "description": "Lightweight async scraper for Google News",
   "main": "index.js",
   "scripts": {
@@ -24,17 +24,18 @@
   "author": "Lewis Donovan",
   "license": "MIT",
   "dependencies": {
+    "@mozilla/readability": "^0.5.0",
     "cheerio": "^1.0.0-rc.3",
-    "node-fetch": "^2.6.7",
-    "puppeteer": "^14.0.0"
+    "jsdom": "^24.0.0",
+    "puppeteer": "^22.1.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.21.5",
-    "@babel/plugin-transform-runtime": "^7.21.4",
-    "@babel/preset-env": "^7.21.5",
-    "babel-jest": "^29.5.0",
+    "@babel/core": "^7.23.9",
+    "@babel/plugin-transform-runtime": "^7.23.9",
+    "@babel/preset-env": "^7.23.9",
+    "babel-jest": "^29.7.0",
     "expect.js": "^0.3.1",
-    "jest": "^27.0.6"
-  }, 
+    "jest": "^29.7.0"
+  },
   "funding": "https://donate.stripe.com/6oE7ue8n57wk4PS7ss"
 }
