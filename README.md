@@ -6,14 +6,14 @@ A lightweight package that scrapes article data from [Google News](https://news.
 
  ![Google News Scraper](https://repository-images.githubusercontent.com/236499568/08f79682-be8e-4625-b84d-7d6ad86bd2d8)
 
-* [Installation](#installation)
-* [Usage](#usage)
-* [Output](#output)
-* [Config](#config)
-* [Performance](#performance)
-* [Upkeep](#upkeep)
-* [Bugs](#bugs)
-* [Contribute](#contribute)
+* [Installation](#installation-)
+* [Usage](#usage-)
+* [Output](#output-)
+* [Config](#config-)
+* [Performance](#performance-)
+* [Upkeep](#upkeep-)
+* [Bugs](#bugs-)
+* [Contribute](#contribute-)
 
 ## Installation 🔌
 ```bash
