@@ -17,7 +17,7 @@ const googleNewsScraper = async (userConfig) => {
 
   const queryString = config.queryVars ? buildQueryString(config.queryVars) : ''
   const url = `https://news.google.com/search?${queryString}&q=${config.searchTerm} when:${config.timeframe || '7d'}`
-    console.log(`SCRAPING NEWS FROM: ${url}`);
+    console.log(`📰 SCRAPING NEWS FROM: ${url}`);
   const requiredArgs = [
     '--disable-extensions-except=/path/to/manifest/folder/',
     '--load-extension=/path/to/manifest/folder/',
