@@ -12,7 +12,7 @@ A lightweight package that scrapes article data from [Google News](https://news.
 * [Config](#config)
 * [Performance](#performance)
 * [Upkeep](#upkeep)
-* [Known issues](#known-issues)
+* [Bugs](#bugs)
 * [Contribute](#contribute)
 
 ## Installation 🔌
