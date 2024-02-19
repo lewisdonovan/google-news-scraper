@@ -14,6 +14,7 @@ A lightweight package that scrapes article data from [Google News](https://news.
 * [Upkeep](#upkeep-)
 * [Bugs](#bugs-)
 * [Contribute](#contribute-)
+* [Python version](#python-version-)
 
 ## Installation 🔌
 ```bash
