@@ -9,15 +9,18 @@ const getArticleContent = require('./getArticleContent').default;
 const googleNewsScraper = async (userConfig) => {
 
   const config = Object.assign({
-    prettyURLs: true, 
-    getArticleContent: false, 
-    timeframe: "7d", 
-    puppeteerArgs: [], 
+    prettyURLs: true,
+    getArticleContent: false,
+    timeframe: "7d",
+    puppeteerArgs: [],
   }, userConfig);
 
   const queryString = config.queryVars ? buildQueryString(config.queryVars) : ''
-  const url = `https://news.google.com/search?${queryString}&q=${config.searchTerm} when:${config.timeframe || '7d'}`
-    console.log(`📰 SCRAPING NEWS FROM: ${url}`);
+  const baseUrl = config.baseUrl ?? `https://news.google.com/search?q=${config.searchTerm}`
+  const timeString = config.timeframe ? ` when:${config.timeframe}` : ''
+  const url = `${baseUrl}}&${queryString}${timeString}`
+
+  console.log(`📰 SCRAPING NEWS FROM: ${url}`);
   const requiredArgs = [
     '--disable-extensions-except=/path/to/manifest/folder/',
     '--load-extension=/path/to/manifest/folder/',
@@ -46,7 +49,7 @@ const googleNewsScraper = async (userConfig) => {
   })
   await page.setCookie({
     name: "CONSENT",
-    value: `YES+cb.${new Date().toISOString().split('T')[0].replace(/-/g,'')}-04-p0.en-GB+FX+667`,
+    value: `YES+cb.${new Date().toISOString().split('T')[0].replace(/-/g, '')}-04-p0.en-GB+FX+667`,
     domain: ".google.com"
   });
   await page.goto(url, { waitUntil: 'networkidle2' });
@@ -54,8 +57,8 @@ const googleNewsScraper = async (userConfig) => {
   try {
     await page.$(`[aria-label="Reject all"]`);
     await Promise.all([
-      page.click(`[aria-label="Reject all"]`), 
-      page.waitForNavigation({waitUntil: 'networkidle2'})
+      page.click(`[aria-label="Reject all"]`),
+      page.waitForNavigation({ waitUntil: 'networkidle2' })
     ]);
   } catch (err) {
     // console.log("ERROR REJECTING COOKIES:", err);
@@ -69,12 +72,12 @@ const googleNewsScraper = async (userConfig) => {
   let i = 0
   const urlChecklist = []
 
-  $(articles).each(function() {
+  $(articles).each(function () {
     const link = $(this).find('a[href^="./article"]').attr('href').replace('./', 'https://news.google.com/') || false
     link && urlChecklist.push(link);
     const srcset = $(this).find('figure').find('img').attr('srcset')?.split(' ');
-    const image = srcset && srcset.length 
-      ? srcset[srcset.length-2] 
+    const image = srcset && srcset.length
+      ? srcset[srcset.length - 2]
       : $(this).find('figure').find('img').attr('src');
     const mainArticle = {
       "title": $(this).find('h4').text() || $(this).find('div > div + div > div a').text(),
