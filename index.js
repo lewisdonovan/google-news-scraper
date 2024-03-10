@@ -11,7 +11,6 @@ const googleNewsScraper = async (userConfig) => {
   const config = Object.assign({
     prettyURLs: true,
     getArticleContent: false,
-    timeframe: "7d",
     puppeteerArgs: [],
   }, userConfig);
 
