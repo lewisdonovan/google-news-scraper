@@ -2,6 +2,8 @@
 
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
+const getTitle = require('./getTitle').default;
+const getArticleType = require('./getArticleType').default;
 const getPrettyUrl = require('./getPrettyUrl').default;
 const buildQueryString = require('./buildQueryString').default;
 const getArticleContent = require('./getArticleContent').default;
@@ -16,8 +18,8 @@ const googleNewsScraper = async (userConfig) => {
 
 
   let queryVars = config.queryVars || {};
-  if (config.searchTerm) {
-    queryVars.q = config.query;
+  if (userConfig.searchTerm) {
+    queryVars.q = userConfig.searchTerm;
   }
 
   const queryString = config.queryVars ? buildQueryString(queryVars) : ''
@@ -48,7 +50,7 @@ const googleNewsScraper = async (userConfig) => {
     headers['Accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3'
     headers['Accept-Encoding'] = 'gzip'
     headers['Accept-Language'] = 'en-US,en;q=0.9,es;q=0.8'
-    headers['Upgrade-Insecure-Requests'] = 1
+    headers['Upgrade-Insecure-Requests'] = "1"
     headers['Referer'] = 'https://www.google.com/'
     request.continue({ headers })
   })
@@ -84,13 +86,16 @@ const googleNewsScraper = async (userConfig) => {
     const image = srcset && srcset.length
       ? srcset[srcset.length - 2]
       : $(this).find('figure').find('img').attr('src');
+    const articleType = getArticleType($, this);
+    const title = getTitle($, this, articleType);
     const mainArticle = {
-      "title": $(this).find('h4').text() || $(this).find('div > div + div > div a').text(),
+      title, 
       "link": link,
       "image": image?.startsWith("/") ? `https://news.google.com${image}` : image,
       "source": $(this).find('div[data-n-tid]').text() || false,
       "datetime": new Date($(this).find('div:last-child time').attr('datetime')) || false,
-      "time": $(this).find('div:last-child time').text() || false,
+      "time": $(this).find('div:last-child time').text() || false, 
+      articleType
     }
     results.push(mainArticle)
     i++
