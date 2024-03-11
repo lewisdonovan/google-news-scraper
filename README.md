@@ -48,7 +48,8 @@ The output is an array of JSON objects, with each article following the structur
         "link":  "http://url-to-website.com/path/to/article",
         "image":"http://url-to-website.com/path/to/image.jpg",
         "source":  "Name of publication",
-        "time":  "Time/date published (human-readable)"
+        "time":  "Time/date published (human-readable)", 
+        "ArticleType": "String, one of ['regular' | 'topicFeatured' | 'topicSmall']"
     }
 ]
 ```
@@ -56,8 +57,19 @@ The output is an array of JSON objects, with each article following the structur
 ## Config ⚙️
 The config object passed to the function above has the following properties:
 
-#### searchTerm (required)
-This is the search query you'd like to find articles for, simply pass the search string like so: `searchTerm: "The Oscars"`.
+#### searchTerm
+This is the search query you'd like to find articles for, simply pass the search string like so: `searchTerm: "The Oscars"`. 
+
+The search term is no longer a required field, as [hahagu](https://github.com/hahagu/) added support for topic pages in [#44](https://github.com/lewisdonovan/google-news-scraper/pull/44). If `searchTerm` and `baseUrl` are noth supplied, the scraper will just return results from the [Google News homepage](https://news.google.com/).
+
+### baseUrl
+The `baseUrl` property enables you to specify an alternate base URL for your search. This is useful when you want to scrape, for example, a specific [Google news topic](https://news.google.com/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGRqTVhZU0FtVnVHZ0pWVXlnQVAB). 
+
+***PLEASE NOTE***: Using both a `baseUrl` that points to a topic AND a `searchTerm` is not advised, as the `searchTerm` will typically be ignored in favour of the topic in the `baseUrl`.
+
+In the scraped URL, your `baseUrl` will be immediately followed by query parameters (eg: `?hl=en-US&gl=US&ceid=US`), so it doesn't matter whether your `baseUrl` has a trailing slash or not.
+
+Defaults to `https://news.google.com/search`
 
 #### prettyURLs
 The URLs that Google News supplies for each article are "ugly" links (eg: `"https://news.google.com/articles/CAIiEPgfWP_e7PfrSwLwvWeb5msqFwgEKg8IACoHCAowjuuKAzCWrzwwt4QY?hl=en-GB&gl=GB&ceid=GB%3Aen"`), buy default the scraper will retrieve the actual "pretty" URL (eg: `"https://www.nytimes.com/2020/01/22/movies/expanded-best-picture-oscar.html"`). This is done using some base64 decoding, so the overhead is negligible. To prevent this default behaviour and retrieve the "ugly" links instead, pass `prettyURLs: false` to the config object.
@@ -74,7 +86,7 @@ The format of the timeframe is a string comprised of a number, followed by a let
 * m = months (eg: `6m`)
 * y = years (eg: `1y`)
 
-Deafults to `7d` (seven days)
+This setting has no default, leaving it blank will return the default results that Google gives if you don't specify a timeframe.
 
 #### getArticleContent
 By default, the scraper does not return the article content, as this would require Puppeteer to navigate to each individual article in the results (increasing execution time significantly). If you would like to enable this behaviour, and receive the content of each article, simply pass `getArticleContent: true,` in the config. This will add two fields to each article in the output: `content` and `favicon`.
