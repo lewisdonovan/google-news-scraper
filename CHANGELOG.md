@@ -26,7 +26,7 @@ To update please run `npm update google-news-scraper`
 - **README.md**
     - Include details of new inputs and output
 
-    ## [1.2.0] - 2024-02-19
+## [1.2.0] - 2024-02-19
   
 To update please run `npm update google-news-scraper`
  
