@@ -14,6 +14,7 @@ const googleNewsScraper = async (userConfig) => {
     prettyURLs: true,
     getArticleContent: false,
     puppeteerArgs: [],
+    puppeteerHeadlessMode: true,
   }, userConfig);
 
 
@@ -33,7 +34,7 @@ const googleNewsScraper = async (userConfig) => {
     '--load-extension=/path/to/manifest/folder/',
   ];
   const puppeteerConfig = {
-    headless: true,
+    headless: userConfig.puppeteerHeadlessMode,
     args: puppeteer.defaultArgs().concat(config.puppeteerArgs).filter(Boolean).concat(requiredArgs)
   }
   const browser = await puppeteer.launch(puppeteerConfig)
