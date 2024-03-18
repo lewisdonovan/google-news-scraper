@@ -128,10 +128,15 @@ Defaults to `null`
 #### puppeteerArgs
 An array of Chromium flags to pass to the browser instance. By default, this will be an empty array. A full list of available flags can be found [here](https://peter.sh/experiments/chromium-command-line-switches/). NB: if you are launching this in a Heroku app, you will need to pass the `--no-sandbox` and `--disable-setuid-sandbox` flags, as explained in [this SO answer](https://stackoverflow.com/a/52228855/7546845).
 
-defaults to `[]`
+Defaults to `[]`
+
+#### puppeteerHeadlessMode
+Whether or not Puppeteer should run in [headless mode](https://www.browserstack.com/guide/puppeteer-headless). Running in headless mode increases performance by approximately 30% (credit to [ole-ve](https://github.com/lewisdonovan/google-news-scraper/pull/45) for finding this). If you're not sure about this setting, leave it as it is.
+
+Defaults to `true`
 
 ## Performance 📈
-My test query returned 99 results, which took 4.5 seconds with article content and 3.6 seconds without it. I'm on a fibre connection, and other queries may return a different number of results, so your mileage may vary. 
+My test query returned 94 results, which took 4.5 seconds with article content and 3.6 seconds without it. I'm on a fibre connection, and other queries may return a different number of results, so your mileage may vary. 
 
 ## Upkeep 🧹
 Please note that this is a web-scraper, which relies on DOM selectors, so any fundamental changes in the markup on the Google News site will probably break this tool. I'll try my best to keep it up-to-date, but changes to the markup on Google News will be silent and therefore difficult to keep track of. Feel free to submit an issue if the tool stops working.

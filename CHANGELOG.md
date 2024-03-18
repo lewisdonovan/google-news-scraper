@@ -2,6 +2,19 @@
 # google-news-scraper CHANGELOG
 All notable changes to this project will be documented in this file.
 
+## [1.2.2] - 2024-03-18
+  
+To update please run `npm update google-news-scraper`
+
+### Changed
+  
+- **index.js**
+    - Merge changes from [#45](https://github.com/lewisdonovan/google-news-scraper/pull/45) (credit to [ole-ve](https://github.com/ole-ve/))
+- **package.json**
+    - Bump version
+- **README.md**
+    - Include details of new `puppeteerHeadlessMode` config item.
+
 ## [1.2.1] - 2024-03-11
   
 To update please run `npm update google-news-scraper`
