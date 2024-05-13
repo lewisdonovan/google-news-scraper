@@ -44,12 +44,12 @@ The output is an array of JSON objects, with each article following the structur
 [
     {
         "title":  "Article title",
-        "subtitle":  "Article subtitle",
         "link":  "http://url-to-website.com/path/to/article",
         "image":"http://url-to-website.com/path/to/image.jpg",
         "source":  "Name of publication",
+        "datetime": 2024-05-13T08:02:22.000Z,
         "time":  "Time/date published (human-readable)", 
-        "ArticleType": "String, one of ['regular' | 'topicFeatured' | 'topicSmall']"
+        "articleType": "String, one of ['regular' | 'topicFeatured' | 'topicSmall']"
     }
 ]
 ```
@@ -95,7 +95,6 @@ By default, the scraper does not return the article content, as this would requi
 [
     {
         "title":  "Article title",
-        "subtitle":  "Article subtitle",
         "link":  "https://url-to-website.com/path/to/article",
         "image":"https://url-to-website.com/path/to/image.jpg",
         "source":  "Name of publication",
