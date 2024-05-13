@@ -23,7 +23,7 @@ const googleNewsScraper = async (userConfig) => {
     queryVars.q = userConfig.searchTerm;
   }
 
-  const queryString = config.queryVars ? buildQueryString(queryVars) : ''
+  const queryString = queryVars ? buildQueryString(queryVars) : ''
   const baseUrl = config.baseUrl ?? `https://news.google.com/search`
   const timeString = config.timeframe ? ` when:${config.timeframe}` : ''
   const url = `${baseUrl}${queryString}${timeString}`
@@ -81,7 +81,7 @@ const googleNewsScraper = async (userConfig) => {
   const urlChecklist = []
 
   $(articles).each(function () {
-    const link = $(this).find('a[href^="./article"]').attr('href').replace('./', 'https://news.google.com/') || false
+    const link = $(this)?.find('a[href^="./article"]')?.attr('href')?.replace('./', 'https://news.google.com/') || false
     link && urlChecklist.push(link);
     const srcset = $(this).find('figure').find('img').attr('srcset')?.split(' ');
     const image = srcset && srcset.length

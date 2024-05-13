@@ -60,7 +60,7 @@ The config object passed to the function above has the following properties:
 #### searchTerm
 This is the search query you'd like to find articles for, simply pass the search string like so: `searchTerm: "The Oscars"`. 
 
-The search term is no longer a required field, as [hahagu](https://github.com/hahagu/) added support for topic pages in [#44](https://github.com/lewisdonovan/google-news-scraper/pull/44). If `searchTerm` and `baseUrl` are noth supplied, the scraper will just return results from the [Google News homepage](https://news.google.com/).
+The search term is no longer a required field, as [hahagu](https://github.com/hahagu/) added support for topic pages in [#44](https://github.com/lewisdonovan/google-news-scraper/pull/44). If `searchTerm` and `baseUrl` are both supplied, the scraper will just return results from the [Google News homepage](https://news.google.com/).
 
 ### baseUrl
 The `baseUrl` property enables you to specify an alternate base URL for your search. This is useful when you want to scrape, for example, a specific [Google news topic](https://news.google.com/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGRqTVhZU0FtVnVHZ0pWVXlnQVAB). 
