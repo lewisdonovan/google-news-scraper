@@ -81,7 +81,7 @@ const googleNewsScraper = async (userConfig) => {
   const urlChecklist = []
 
   $(articles).each(function () {
-    const link = $(this)?.find('a[href^="./article"]')?.attr('href')?.replace('./', 'https://news.google.com/') || false
+    const link = $(this)?.find('a[href^="./article"]')?.attr('href')?.replace('./', 'https://news.google.com/') || $(this)?.find('a[href^="./read"]')?.attr('href')?.replace('./', 'https://news.google.com/') || false
     link && urlChecklist.push(link);
     const srcset = $(this).find('figure').find('img').attr('srcset')?.split(' ');
     const image = srcset && srcset.length
