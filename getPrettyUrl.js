@@ -24,3 +24,6 @@ const getPrettyUrl = (uglyUrl) => {
     return [];
   }
 }
+module.exports = {
+  default: getPrettyUrl
+}
