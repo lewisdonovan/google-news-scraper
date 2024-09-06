@@ -1,4 +1,4 @@
-const getPrettyUrl = (uglyUrl) => {
+const getPrettyUrl = (uglyUrl, logger) => {
   const base64Match = uglyUrl.match(/\/read\/([A-Za-z0-9-_]+)/);
   if (!base64Match) {
     return [];
@@ -17,13 +17,14 @@ const getPrettyUrl = (uglyUrl) => {
     });
     const uniqueUrls = [...new Set(urls)];
     const finalUrl = uniqueUrls.length ? uniqueUrls[0] : uglyUrl;
-    console.log(finalUrl);
+    logger.info(finalUrl);
     return finalUrl;
   } catch (error) {
-    console.error('Error decoding base64:', error);
+    logger.error(error);
     return [];
   }
 }
+
 module.exports = {
   default: getPrettyUrl
 }

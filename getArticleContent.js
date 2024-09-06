@@ -2,9 +2,6 @@ const { Readability } = require('@mozilla/readability');
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 
-const virtualConsole = new jsdom.VirtualConsole();
-virtualConsole.on("error", () => {});
-
 const verifyMessages = [
   "you are human", 
   "are you human", 
@@ -12,10 +9,10 @@ const verifyMessages = [
   "recaptcha"
 ];
 
-const getArticleContent = async (articles, browser, filterWords) => {
+const getArticleContent = async (articles, browser, filterWords, logger) => {
   try {
     const processedArticlesPromises = articles.map(article =>
-      extractArticleContentAndFavicon(article, browser, filterWords)
+      extractArticleContentAndFavicon(article, browser, filterWords, logger)
     );
 
     const processedArticles = await Promise.all(processedArticlesPromises);
@@ -23,12 +20,12 @@ const getArticleContent = async (articles, browser, filterWords) => {
     return processedArticles;
 
   } catch (err) {
-    // console.log("getArticleContent ERROR:", err);
+    logger.error("getArticleContent ERROR:", err);
     return articles;
   }
 }
 
-const extractArticleContentAndFavicon = async (article, browser, filterWords) => {
+const extractArticleContentAndFavicon = async (article, browser, filterWords, logger) => {
   try {
     const page = await browser.newPage();
     await page.goto(article.link, { waitUntil: 'networkidle2' });
@@ -39,32 +36,35 @@ const extractArticleContentAndFavicon = async (article, browser, filterWords) =>
       return link ? link.getAttribute('href') : '';
     });
 
+    const virtualConsole = new jsdom.VirtualConsole();
+    virtualConsole.on("error", logger.error);
+
     const dom = new JSDOM(content, { url: article.link, virtualConsole });
     let reader = new Readability(dom.window.document);
     const articleContent = reader.parse();
 
     if (!articleContent || !articleContent.textContent) {
-      // console.log("Article content could not be parsed or is empty.");
+      logger.warn("Article content could not be parsed or is empty.", {article});
       return { ...article, content: '', favicon};
     }
 
     const hasVerifyMessage = verifyMessages.find(w => articleContent.textContent.toLowerCase().includes(w));
     if (hasVerifyMessage) {
-      // console.log("Article requires human verification.");
+      logger.warn("Article requires human verification.", {article});
       return { ...article, content: '', favicon};
     }
 
     const cleanedText = cleanText(articleContent.textContent, filterWords);
     
     if (cleanedText.split(' ').length < 100) { // Example threshold: 100 words
-      // console.log("Article content is too short and likely not valuable.");
+      logger.warn("Article content is too short and likely not valuable.", {article});
       return { ...article, content: '', favicon };
     }
 
-    // console.log("SUCCESSFULLY SCRAPED ARTICLE CONTENT:", cleanedText);
+    logger.info("SUCCESSFULLY SCRAPED ARTICLE CONTENT:", cleanedText);
     return { ...article, content: cleanedText, favicon};
   } catch (error) {
-    // console.error('Error extracting article with Puppeteer:', error);
+    logger.error(error);
     return { ...article, content: '', favicon: '' };
   }
 }

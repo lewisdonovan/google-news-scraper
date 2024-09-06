@@ -2,6 +2,8 @@
 
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
+
+const getLogger = require('./logger');
 const getTitle = require('./getTitle').default;
 const getArticleType = require('./getArticleType').default;
 const getPrettyUrl = require('./getPrettyUrl').default;
@@ -14,9 +16,11 @@ const googleNewsScraper = async (userConfig) => {
     prettyURLs: true,
     getArticleContent: false,
     puppeteerArgs: [],
-    puppeteerHeadlessMode: true,
+    puppeteerHeadlessMode: true, 
+    logLevel: 'error',
   }, userConfig);
 
+  const logger = getLogger(config.logLevel);
 
   let queryVars = config.queryVars || {};
   if (userConfig.searchTerm) {
@@ -28,7 +32,7 @@ const googleNewsScraper = async (userConfig) => {
   const timeString = config.timeframe ? ` when:${config.timeframe}` : ''
   const url = `${baseUrl}${queryString}${timeString}`
 
-  console.log(`📰 SCRAPING NEWS FROM: ${url}`);
+  logger.info(`📰 SCRAPING NEWS FROM: ${url}`);
   const requiredArgs = [
     '--disable-extensions-except=/path/to/manifest/folder/',
     '--load-extension=/path/to/manifest/folder/',
@@ -68,9 +72,7 @@ const googleNewsScraper = async (userConfig) => {
       page.click(`[aria-label="Reject all"]`),
       page.waitForNavigation({ waitUntil: 'networkidle2' })
     ]);
-  } catch (err) {
-    // console.log("ERROR REJECTING COOKIES:", err);
-  }
+  } catch (err) {}
 
   const content = await page.content();
   const $ = cheerio.load(content);
@@ -104,7 +106,7 @@ const googleNewsScraper = async (userConfig) => {
 
   if (config.prettyURLs) {
     results = await Promise.all(results.map(article => {
-      const url = getPrettyUrl(article.link);
+      const url = getPrettyUrl(article.link, logger);
       article.link = url;
       return article;
     }));
@@ -112,7 +114,7 @@ const googleNewsScraper = async (userConfig) => {
 
   if (config.getArticleContent) {
     const filterWords = config.filterWords || [];
-    results = await getArticleContent(results, browser, filterWords);
+    results = await getArticleContent(results, browser, filterWords, logger);
   }
 
   await page.close();

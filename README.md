@@ -109,6 +109,17 @@ By default, the scraper does not return the article content, as this would requi
 
 Defaults to `false`
 
+#### logLevel
+You can customise the log level to any of the following:
+
+- `none`: No logs will be output at all.
+- `error`: Only errors will be outputted to the log.
+- `warn`: Errors and warnings will be output to the log. 
+- `info`: Info, errors and warnings will be output to the log. 
+- `verbose`: All of the above and potentially more. Currently there are no specifically verbose logs, but in future I may move some of the info logs to verbose and/or add some debugging info there.
+
+Defaults to `error`.
+
 #### queryVars
 An object of additional query params to add to the Google News URL string, formatted as key value pairs. This can be useful if you want to search for articles in a specific language, for example:
 ```javascript
