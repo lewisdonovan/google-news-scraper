@@ -86,7 +86,7 @@ The format of the timeframe is a string comprised of a number, followed by a let
 * m = months (eg: `6m`)
 * y = years (eg: `1y`)
 
-This setting has no default, leaving it blank will return the default results that Google gives if you don't specify a timeframe.
+Defaults to `7d`.
 
 #### getArticleContent
 By default, the scraper does not return the article content, as this would require Puppeteer to navigate to each individual article in the results (increasing execution time significantly). If you would like to enable this behaviour, and receive the content of each article, simply pass `getArticleContent: true,` in the config. This will add two fields to each article in the output: `content` and `favicon`.
