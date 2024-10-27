@@ -1,6 +1,6 @@
-import { Logger } from "winston";
+import winston from "winston";
 
-const getPrettyUrl = (uglyUrl: string, logger: Logger): string | null => {
+const getPrettyUrl = (uglyUrl: string, logger: winston.Logger): string | null => {
   const base64Match = uglyUrl.match(/\/read\/([A-Za-z0-9-_]+)/);
   if (!base64Match) {
     return null;

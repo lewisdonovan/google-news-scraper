@@ -1,15 +1,13 @@
-'use strict'
-
 import puppeteer from 'puppeteer';
 import * as cheerio from 'cheerio';
 
-import getLogger from './getLogger.js';
-import getTitle from './getTitle.js';
-import getArticleType from './getArticleType.js';
-import getPrettyUrl from './getPrettyUrl.js';
-import buildQueryString from './buildQueryString.js';
-import getArticleContent from './getArticleContent.js';
-import { Article, Articles, GNSConfig, GNSUserConfig, QueryVars } from './types.js';
+import getLogger from './getLogger';
+import getTitle from './getTitle';
+import getArticleType from './getArticleType';
+import getPrettyUrl from './getPrettyUrl';
+import buildQueryString from './buildQueryString';
+import getArticleContent from './getArticleContent';
+import { Article, Articles, GNSConfig, GNSUserConfig, QueryVars } from './types';
 
 const googleNewsScraper = async (userConfig: GNSUserConfig) => {
   const config: GNSConfig = {
@@ -133,4 +131,4 @@ const googleNewsScraper = async (userConfig: GNSUserConfig) => {
 
 }
 
-module.exports = googleNewsScraper;
+export default googleNewsScraper;

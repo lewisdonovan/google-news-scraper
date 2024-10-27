@@ -1,5 +1,5 @@
 import { LogLevel } from "./types";
-import winston, { Logger } from 'winston';
+import winston from 'winston';
 
 const config = {
   levels: {
@@ -20,7 +20,7 @@ const config = {
 
 winston.addColors(config.colors);
 
-const getLogger = (level: LogLevel): Logger => (
+const getLogger = (level: LogLevel): winston.Logger => (
   winston.createLogger({
     levels: config.levels,
     format: winston.format.combine(

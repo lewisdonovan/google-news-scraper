@@ -1,5 +1,3 @@
-'use strict'
-
 import { QueryVars } from "./types"
 
 const buildQueryString = (query: QueryVars) => {

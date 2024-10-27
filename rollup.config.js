@@ -1,21 +1,47 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import typescript from '@rollup/plugin-typescript';
-import { terser } from 'rollup-plugin-terser';
 import json from '@rollup/plugin-json';
+import del from 'rollup-plugin-delete';
+import { terser } from 'rollup-plugin-terser';
 
 export default {
-  input: 'src/index.ts', // Entry point of your package
-  output: {
-    dir: 'dist', // Change from 'file' to 'dir' to handle multiple chunks.
-    format: 'cjs', // You can adjust for your needs.
-    sourcemap: true,
-  },
-  plugins: [
-    json(),       // Handles JSON imports
-    resolve({ preferBuiltins: false }),
-    typescript({ tsconfig: './tsconfig.json' }), // Compiles TypeScript
-    terser(), // Minifies the output bundle for production
-    commonjs({ context: "global" }),
+  input: './dist/tsc/index.js', // Change to compiled JavaScript from tsc
+  output: [
+    {
+      dir: './dist/esm',
+      format: 'esm',
+      sourcemap: true,
+      preserveModules: false,
+      entryFileNames: '[name].js',
+    },
+    {
+      dir: './dist/esm/min',
+      format: 'esm',
+      plugins: [terser()],
+      sourcemap: true,
+      entryFileNames: '[name].min.js',
+    },
+    {
+      dir: './dist/cjs',
+      format: 'cjs',
+      sourcemap: false,
+      exports: 'auto',
+      entryFileNames: '[name].js',
+    },
+    {
+      dir: './dist/cjs/min',
+      format: 'cjs',
+      plugins: [terser()],
+      sourcemap: true,
+      exports: 'auto',
+      entryFileNames: '[name].min.js',
+    },
   ],
+  plugins: [
+    del({ targets: ['./dist/esm/*', './dist/cjs/*'] }),
+    resolve(),
+    commonjs(),
+    json(),
+  ],
+  external: ['puppeteer', 'cheerio', 'jsdom', 'winston'],
 };

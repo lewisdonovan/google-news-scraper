@@ -1,4 +1,5 @@
-import { Logger } from "winston";
+import { Browser } from 'puppeteer';
+import winston from "winston";
 
 type Timeframe = `${number}${'h' | 'd' | 'm' | 'y'}`;
 export type LogLevel = 'none' | 'error' | 'warn' | 'info' | 'verbose';
@@ -46,14 +47,14 @@ export type Articles = Article[];
 
 export interface GetArticleContentProps {
   articles: Articles
-  browser: any;
+  browser: Browser;
   filterWords: string[];
-  logger: Logger;
+  logger: winston.Logger;
 }
 
 export interface ExtractArticleContentAndFaviconProps {
   article: Article;
-  browser: any;
+  browser: Browser;
   filterWords: string[];
-  logger: Logger;
+  logger: winston.Logger;
 }

@@ -1,0 +1,26 @@
+**Limited License Agreement**
+
+**1. Grant of License**  
+This software is provided as-is, with a limited license for use. Users are allowed to download and install the software, but usage of the features beyond the basic, free tier is subject to the possession of a valid API key. API keys are distributed separately and may require payment, depending on the selected usage tier.
+
+**2. No Warranty**  
+The software is provided "as is," without any warranties of any kind, either express or implied. There are no guarantees regarding the performance, accuracy, or reliability of the software. The user assumes all risks associated with its use.
+
+**3. Limitation of Liability**  
+In no event shall the developer, contributors, or anyone associated with the software be liable for any damages, including but not limited to direct, indirect, incidental, or consequential damages arising out of or in connection with the use of the software. Users agree to use the software at their own risk.
+
+**4. Restrictions on Use**  
+Users on the free tier are permitted to use the software, provided they do not attempt to circumvent or modify the software in any way to extend its functionality without obtaining an appropriate API key. Unauthorized attempts to access or alter the software's behavior will result in the termination of the license.
+
+**5. Indemnity**  
+Users agree to indemnify and hold harmless the developer, contributors, and affiliated entities from any claims, damages, liabilities, and expenses arising from their use of the software, including any unauthorized or unintended use.
+
+**6. Termination**  
+The developer reserves the right to terminate or revoke the license at any time if users do not comply with the terms and conditions stated herein.
+
+**7. Governing Law**  
+This agreement shall be governed by and construed in accordance with the laws of [Your Jurisdiction], without regard to its conflict of law principles.
+
+**8. Agreement**  
+By installing or using the software, users agree to be bound by the terms and conditions of this license.
+

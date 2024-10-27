@@ -1,8 +1,6 @@
-import { ExtractArticleContentAndFaviconProps, GetArticleContentProps } from "./types";
-
-const { Readability } = require('@mozilla/readability');
-const jsdom = require("jsdom");
-const { JSDOM } = jsdom;
+import { Readability } from '@mozilla/readability';
+import { JSDOM, VirtualConsole } from 'jsdom';
+import { Article, Articles, ExtractArticleContentAndFaviconProps, GetArticleContentProps } from "./types"
 
 const verifyMessages = [
   "you are human", 
@@ -13,7 +11,7 @@ const verifyMessages = [
 
 const getArticleContent = async ({
   articles, browser, filterWords, logger
-}: GetArticleContentProps) => {
+}: GetArticleContentProps): Promise<Articles> => {
   try {
     const processedArticlesPromises = articles.map(article =>
       extractArticleContentAndFavicon({article, browser, filterWords, logger})
@@ -31,7 +29,7 @@ const getArticleContent = async ({
 
 const extractArticleContentAndFavicon = async ({
   article, browser, filterWords, logger
-}: ExtractArticleContentAndFaviconProps) => {
+}: ExtractArticleContentAndFaviconProps): Promise<Article> => {
   try {
     const page = await browser.newPage();
     await page.goto(article.link, { waitUntil: 'networkidle2' });
@@ -40,9 +38,9 @@ const extractArticleContentAndFavicon = async ({
     const favicon = await page.evaluate(() => {
       const link = document.querySelector('link[rel="icon"], link[rel="shortcut icon"]');
       return link ? link.getAttribute('href') : '';
-    });
+    }) ?? "";
 
-    const virtualConsole = new jsdom.VirtualConsole();
+    const virtualConsole = new VirtualConsole();
     virtualConsole.on("error", logger.error);
 
     const dom = new JSDOM(content, { url: article.link, virtualConsole });
