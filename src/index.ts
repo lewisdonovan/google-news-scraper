@@ -7,7 +7,13 @@ import getArticleType from './getArticleType';
 import getPrettyUrl from './getPrettyUrl';
 import buildQueryString from './buildQueryString';
 import getArticleContent from './getArticleContent';
-import { Article, Articles, GNSConfig, GNSUserConfig, QueryVars } from './types';
+import { 
+  QueryVars,
+  GNSUserConfig, 
+  GNSConfig,
+  Article,
+  Articles
+} from "./types"
 
 const googleNewsScraper = async (userConfig: GNSUserConfig) => {
   const config: GNSConfig = {
@@ -131,4 +137,5 @@ const googleNewsScraper = async (userConfig: GNSUserConfig) => {
 
 }
 
+export * from "./types";
 export default googleNewsScraper;

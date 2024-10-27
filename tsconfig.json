@@ -3,6 +3,7 @@
         "target": "ES6",
         "module": "ESNext",
         "declaration": true,
+        "declarationMap": false,
         "outDir": "./dist/tsc",
         "rootDir": "./src",
         "strict": true,

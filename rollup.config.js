@@ -12,14 +12,14 @@ export default {
       format: 'esm',
       sourcemap: true,
       preserveModules: false,
-      entryFileNames: '[name].js',
+      entryFileNames: '[name].mjs',
     },
     {
       dir: './dist/esm/min',
       format: 'esm',
       plugins: [terser()],
       sourcemap: true,
-      entryFileNames: '[name].min.js',
+      entryFileNames: '[name].min.mjs',
     },
     {
       dir: './dist/cjs',

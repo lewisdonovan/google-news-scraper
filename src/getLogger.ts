@@ -1,4 +1,4 @@
-import { LogLevel } from "./types";
+import { LogLevel } from "./types"
 import winston from 'winston';
 
 const config = {

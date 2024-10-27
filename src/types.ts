@@ -58,3 +58,7 @@ export interface ExtractArticleContentAndFaviconProps {
   filterWords: string[];
   logger: winston.Logger;
 }
+
+declare const googleNewsScraper: (userConfig: GNSUserConfig) => Promise<Article[]>;
+
+export default googleNewsScraper;
