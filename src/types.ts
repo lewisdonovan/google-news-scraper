@@ -18,6 +18,7 @@ export type GNSUserConfig = SearchParams & {
   logLevel?: LogLevel;
   queryVars?: QueryVars;
   filterWords?: string[];
+  limit?: number;
 };
 
 export type GNSConfig = SearchParams & {
@@ -29,6 +30,7 @@ export type GNSConfig = SearchParams & {
   logLevel: LogLevel;
   queryVars: QueryVars;
   filterWords?: string[];
+  limit: number;
 };
 
 export type Article = {

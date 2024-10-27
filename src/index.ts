@@ -24,7 +24,8 @@ const googleNewsScraper = async (userConfig: GNSUserConfig) => {
       puppeteerHeadlessMode: true,
       logLevel: 'error',
       timeframe: '7d',
-      queryVars: {},
+      queryVars: {}, 
+      limit: 99
     },
     ...userConfig,
   } as GNSConfig;
@@ -133,7 +134,8 @@ const googleNewsScraper = async (userConfig: GNSUserConfig) => {
   await page.close();
   await browser.close()
 
-  return results.filter(result => result.title)
+  const filtered = results.filter(result => result.title);
+  return config.limit < results.length ? filtered.slice(0, config.limit) : filtered;
 
 }
 

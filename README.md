@@ -147,6 +147,11 @@ Whether or not Puppeteer should run in [headless mode](https://www.browserstack.
 
 Defaults to `true`
 
+#### limit
+The total number of articles that you would like to be returned. Please note that with higher numbers, the actual returned number may be lower. Typically the max is `99`, but it varies depending on many variables in Puppeteer (such as rate limiting, network conditions etc.). 
+
+Defaults to `99`
+
 ## TypeScript 💙
 Google News Scraper includes full [TypeScript](https://typescriptlang.org/) definitions. 
 
