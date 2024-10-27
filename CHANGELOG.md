@@ -2,6 +2,17 @@
 # google-news-scraper CHANGELOG
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - 2024-10-27
+
+To update please run `npm update google-news-scraper`
+
+### Changed
+  
+- Added support for both ESM and CJS. 
+- Added TypeScript support. 
+- Integrated Rollup to make shipping easier. 
+- Added release action, to bump version and ship to NPM every time we push to `master` branch`. 
+
 ## [1.2.2] - 2024-03-18
   
 To update please run `npm update google-news-scraper`

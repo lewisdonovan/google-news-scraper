@@ -10,6 +10,8 @@ A lightweight package that scrapes article data from [Google News](https://news.
 * [Usage](#usage-%EF%B8%8F)
 * [Output](#output-)
 * [Config](#config-%EF%B8%8F)
+* [TypeScript](#typescript-)
+* [CommonJS](#common-js-)
 * [Performance](#performance-)
 * [Upkeep](#upkeep-)
 * [Bugs](#bugs-)
@@ -30,7 +32,7 @@ yarn add google-news-scraper
 ## Usage 🕹️
 Simply import the package and pass a config object.
 ```javascript
-const googleNewsScraper = require('google-news-scraper');
+import googleNewsScraper from 'google-news-scraper';
 
 const articles = await googleNewsScraper({ searchTerm: "The Oscars" });
 
@@ -144,6 +146,20 @@ Defaults to `[]`
 Whether or not Puppeteer should run in [headless mode](https://www.browserstack.com/guide/puppeteer-headless). Running in headless mode increases performance by approximately 30% (credit to [ole-ve](https://github.com/lewisdonovan/google-news-scraper/pull/45) for finding this). If you're not sure about this setting, leave it as it is.
 
 Defaults to `true`
+
+## TypeScript 💙
+Google News Scraper includes full [TypeScript](https://typescriptlang.org/) definitions. 
+
+Your IDE should pick the types up automatically, but if not you can find them in the `dist/tsc/` folder.
+
+## Common JS 👴🏻
+Google News Scraper is built to work as an [ESM module](https://nodejs.org/api/esm.html) out of the box, but also works as a [Common JS module](https://nodejs.org/api/modules.html) too, just use `require` instead of `import`:
+```javascript
+const googleNewsScraper = require('google-news-scraper');
+
+const articles = await googleNewsScraper({ searchTerm: "The Oscars" });
+
+```
 
 ## Performance 📈
 My test query returned 94 results, which took 4.5 seconds with article content and 3.6 seconds without it. I'm on a fibre connection, and other queries may return a different number of results, so your mileage may vary. 
