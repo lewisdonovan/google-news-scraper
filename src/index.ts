@@ -32,15 +32,16 @@ const googleNewsScraper = async (userConfig: GNSUserConfig) => {
 
   const logger = getLogger(config.logLevel);
 
-  const queryVars: QueryVars = config.queryVars ?? {};
+  const queryVars: QueryVars = config.queryVars 
+    ? { ...config.queryVars, when: config.timeframe }
+    : { when: config.timeframe};
   if (userConfig.searchTerm) {
     queryVars.q = userConfig.searchTerm;
   }
 
-  const queryString = queryVars ? buildQueryString(queryVars) : '';
+  const queryString = buildQueryString(queryVars) ?? '';
   const baseUrl = config.baseUrl ?? `https://news.google.com/search`;
-  const timeString = config.timeframe ? ` when:${config.timeframe}` : '';
-  const url = `${baseUrl}${queryString}${timeString}`;
+  const url = `${baseUrl}${queryString}`;
 
   logger.info(`📰 SCRAPING NEWS FROM: ${url}`);
   const requiredArgs = [
@@ -89,10 +90,10 @@ const googleNewsScraper = async (userConfig: GNSUserConfig) => {
 
   const articles = $('article');
   let results: Articles = [];
-  let i = 0
-  const urlChecklist = []
+  let i = 0;
+  const urlChecklist = [];
 
-  $(articles).each(function () {
+  $(articles).each(function() {
     const link = $(this)?.find('a[href^="./article"]')?.attr('href')?.replace('./', 'https://news.google.com/') || $(this)?.find('a[href^="./read"]')?.attr('href')?.replace('./', 'https://news.google.com/') || ""
     link && urlChecklist.push(link);
     const srcset = $(this).find('figure').find('img').attr('srcset')?.split(' ');
@@ -100,7 +101,6 @@ const googleNewsScraper = async (userConfig: GNSUserConfig) => {
       ? srcset[srcset.length - 2]
       : $(this).find('figure').find('img').attr('src');
     const articleType = getArticleType($(this));
-    // TODO: Done up to here
 
     const title = getTitle($(this), articleType);
     const mainArticle: Article = {

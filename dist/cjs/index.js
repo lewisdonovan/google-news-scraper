@@ -2725,14 +2725,14 @@ const googleNewsScraper = (userConfig) => __awaiter(void 0, void 0, void 0, func
         limit: 99
     }, userConfig);
     const logger = getLogger(config.logLevel);
-    const queryVars = (_a = config.queryVars) !== null && _a !== void 0 ? _a : {};
+    const queryVars = config.queryVars
+        ? Object.assign(Object.assign({}, config.queryVars), { when: config.timeframe }) : { when: config.timeframe };
     if (userConfig.searchTerm) {
         queryVars.q = userConfig.searchTerm;
     }
-    const queryString = queryVars ? buildQueryString(queryVars) : '';
+    const queryString = (_a = buildQueryString(queryVars)) !== null && _a !== void 0 ? _a : '';
     const baseUrl = (_b = config.baseUrl) !== null && _b !== void 0 ? _b : `https://news.google.com/search`;
-    const timeString = config.timeframe ? ` when:${config.timeframe}` : '';
-    const url = `${baseUrl}${queryString}${timeString}`;
+    const url = `${baseUrl}${queryString}`;
     logger.info(`📰 SCRAPING NEWS FROM: ${url}`);
     const requiredArgs = [
         '--disable-extensions-except=/path/to/manifest/folder/',
@@ -2778,7 +2778,7 @@ const googleNewsScraper = (userConfig) => __awaiter(void 0, void 0, void 0, func
     const $ = cheerio__namespace.load(content);
     const articles = $('article');
     let results = [];
-    $(articles).each(function () {
+    $(articles).each(function (i) {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j;
         const link = ((_c = (_b = (_a = $(this)) === null || _a === void 0 ? void 0 : _a.find('a[href^="./article"]')) === null || _b === void 0 ? void 0 : _b.attr('href')) === null || _c === void 0 ? void 0 : _c.replace('./', 'https://news.google.com/')) || ((_f = (_e = (_d = $(this)) === null || _d === void 0 ? void 0 : _d.find('a[href^="./read"]')) === null || _e === void 0 ? void 0 : _e.attr('href')) === null || _f === void 0 ? void 0 : _f.replace('./', 'https://news.google.com/')) || "";
         const srcset = (_g = $(this).find('figure').find('img').attr('srcset')) === null || _g === void 0 ? void 0 : _g.split(' ');
@@ -2786,7 +2786,6 @@ const googleNewsScraper = (userConfig) => __awaiter(void 0, void 0, void 0, func
             ? srcset[srcset.length - 2]
             : $(this).find('figure').find('img').attr('src');
         const articleType = getArticleType($(this));
-        // TODO: Done up to here
         const title = getTitle($(this), articleType);
         const mainArticle = {
             title,

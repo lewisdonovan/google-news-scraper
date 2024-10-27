@@ -128,7 +128,6 @@ An object of additional query params to add to the Google News URL string, forma
 const articles = await googleNewsScraper({
     searchTerm: "Últimas noticias en Madrid",
     queryVars: {
-        hl:"es-ES",
         gl:"ES",
         ceid:"ES:es"
     },
