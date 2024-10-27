@@ -18,7 +18,8 @@
     "test": "jest",
     "build:ts": "tsc",
     "build:rollup": "rollup -c",
-    "build": "rm -rf ./dist/* && npm run build:ts && npm run build:rollup"
+    "build": "rm -rf ./dist/* && npm run build:ts && npm run build:rollup",
+    "build:ci": "rm -rf ./dist/* && npm run build:ts && rollup -c --bundleConfigAsCjs"
   },
   "repository": {
     "type": "git",
