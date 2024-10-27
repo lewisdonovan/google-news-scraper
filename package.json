@@ -67,5 +67,8 @@
     "semantic-release": "^24.2.0",
     "typescript": "^5.6.3"
   },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.24.2"
+  },
   "funding": "https://donate.stripe.com/6oE7ue8n57wk4PS7ss"
 }
