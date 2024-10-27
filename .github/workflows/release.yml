@@ -15,13 +15,14 @@ jobs:
           node-version: 20
       - name: Install Dependencies
         run: npm ci --legacy-peer-deps
+      - name: Build
+        run: npm run build
       - name: Semantic release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npx semantic-release
-      - name: Build
-        run: npm run build
-      - name: Publish to NPM
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish
+      # - name: Publish to NPM
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      #   run: npm publish
