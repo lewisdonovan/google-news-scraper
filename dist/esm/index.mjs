@@ -2682,8 +2682,6 @@ const cleanText = (text, filterWords) => {
         .join('\n');
 };
 
-googleNewsScraper;
-
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -2693,7 +2691,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const googleNewsScraper$1 = (userConfig) => __awaiter(void 0, void 0, void 0, function* () {
+const googleNewsScraper = (userConfig) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     const config = Object.assign({
         prettyURLs: true,
@@ -2799,5 +2797,5 @@ const googleNewsScraper$1 = (userConfig) => __awaiter(void 0, void 0, void 0, fu
     return config.limit < results.length ? filtered.slice(0, config.limit) : filtered;
 });
 
-export { googleNewsScraper$1 as default };
+export { googleNewsScraper as default };
 //# sourceMappingURL=index.mjs.map

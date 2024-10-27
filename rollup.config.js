@@ -10,6 +10,7 @@ export default {
     {
       dir: './dist/esm',
       format: 'esm',
+      interop: 'esModule',
       sourcemap: true,
       preserveModules: false,
       entryFileNames: '[name].mjs',
@@ -17,6 +18,7 @@ export default {
     {
       dir: './dist/esm/min',
       format: 'esm',
+      interop: 'esModule',
       plugins: [terser()],
       sourcemap: true,
       entryFileNames: '[name].min.mjs',
