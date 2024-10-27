@@ -10,8 +10,8 @@
     "require": "./dist/cjs/index.js"
   },
   "files": [
-    "dist/cjs/**/*.cjs",
-    "dist/esm/**/*.js",
+    "dist/cjs",
+    "dist/esm",
     "dist/tsc/**/*.d.ts"
   ],
   "scripts": {
