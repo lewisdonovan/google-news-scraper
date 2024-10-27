@@ -2,7 +2,7 @@ name: Release
 on:
   push:
     branches:
-      - master
+      - ci-fixes
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -17,6 +17,8 @@ jobs:
         run: npm i
       - name: Build
         run: npm run build:ci
+      - name: Verify Build Output
+        run: ls -R dist
       - name: Semantic release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
