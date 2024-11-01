@@ -83,7 +83,7 @@ const googleNewsScraper = (userConfig) => __awaiter(void 0, void 0, void 0, func
     let results = [];
     let i = 0;
     const urlChecklist = [];
-    $(articles).each(function (i) {
+    $(articles).each(function () {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j;
         const link = ((_c = (_b = (_a = $(this)) === null || _a === void 0 ? void 0 : _a.find('a[href^="./article"]')) === null || _b === void 0 ? void 0 : _b.attr('href')) === null || _c === void 0 ? void 0 : _c.replace('./', 'https://news.google.com/')) || ((_f = (_e = (_d = $(this)) === null || _d === void 0 ? void 0 : _d.find('a[href^="./read"]')) === null || _e === void 0 ? void 0 : _e.attr('href')) === null || _f === void 0 ? void 0 : _f.replace('./', 'https://news.google.com/')) || "";
         link && urlChecklist.push(link);

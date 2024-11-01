@@ -33,10 +33,9 @@ yarn add google-news-scraper
 Simply import the package and pass a config object.
 ```javascript
 import googleNewsScraper from 'google-news-scraper';
-
 const articles = await googleNewsScraper({ searchTerm: "The Oscars" });
-
 ```
+A minimum working example can be found in [this repo](https://github.com/lewisdonovan/gns-example). 
 Full documentation on the [config object](#config) can be found below.
 
 ## Output 📲
