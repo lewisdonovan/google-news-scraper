@@ -18,6 +18,7 @@ const googleNewsScraper = async (userConfig) => {
     puppeteerArgs: [],
     puppeteerHeadlessMode: true, 
     logLevel: 'error',
+    rotatingProxies: null,
   }, userConfig);
 
   const logger = getLogger(config.logLevel);
@@ -114,7 +115,7 @@ const googleNewsScraper = async (userConfig) => {
 
   if (config.getArticleContent) {
     const filterWords = config.filterWords || [];
-    results = await getArticleContent(results, browser, filterWords, logger);
+    results = await getArticleContent(results, browser, filterWords, logger, config.rotatingProxies);
   }
 
   await page.close();
