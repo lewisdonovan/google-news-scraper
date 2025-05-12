@@ -2,15 +2,18 @@
 
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
+const connectDB = require('./db/config');
+const Article = require('./models/Article');
 
 const getLogger = require('./logger');
-const getTitle = require('./getTitle').default;
-const getArticleType = require('./getArticleType').default;
-const getPrettyUrl = require('./getPrettyUrl').default;
-const buildQueryString = require('./buildQueryString').default;
-const getArticleContent = require('./getArticleContent').default;
+const getTitle = require('./backup/getTitle').default;
+const getArticleType = require('./backup/getArticleType').default;
+const getPrettyUrl = require('./backup/getPrettyUrl').default;
+const buildQueryString = require('./backup/buildQueryString').default;
+const getArticleContent = require('./backup/getArticleContent').default;
 
 const googleNewsScraper = async (userConfig) => {
+  await connectDB();
 
   const config = Object.assign({
     prettyURLs: true,
@@ -118,10 +121,30 @@ const googleNewsScraper = async (userConfig) => {
   }
 
   await page.close();
-  await browser.close()
+  await browser.close();
 
-  return results.filter(result => result.title)
+  // Add search term to articles and filter out Motley Fool articles
+  const articlesWithMeta = results
+    .filter(result => result.title)
+    .filter(article => article.source !== "The Motley Fool")
+    .map(article => ({
+      ...article,
+      searchTerm: userConfig.searchTerm
+    }));
 
+  try {
+    // Use insertMany with ordered: false to continue on duplicate key errors
+    const savedArticles = await Article.insertMany(articlesWithMeta, { ordered: false });
+    logger.info(`Saved ${savedArticles.length} new articles to MongoDB Atlas`);
+  } catch (error) {
+    if (error.code === 11000) {
+      logger.info('Some articles were already in the database (duplicates skipped)');
+    } else {
+      logger.error('Error saving to MongoDB:', error);
+    }
+  }
+
+  return articlesWithMeta;
 }
 
 module.exports = googleNewsScraper;
