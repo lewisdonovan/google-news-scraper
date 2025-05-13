@@ -11,12 +11,42 @@ const articleSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  image: String,
-  source: String,
-  datetime: Date,
-  time: String,
-  articleType: String,
-  searchTerm: String,
+  source: {
+    type: String,
+    required: true
+  },
+  image: {
+    type: String,
+    default: null
+  },
+  publishedAt: {
+    type: Date,
+    required: true
+  },
+  articleType: {
+    type: String,
+    default: 'news'
+  },
+  searchTerm: {
+    type: String,
+    required: true
+  },
+  category: {
+    type: String,
+    default: ''
+  },
+  tags: {
+    type: [String],
+    default: []
+  },
+  used: {
+    type: Boolean,
+    default: false
+  },
+    usedAt: {
+    type: Date,
+    default: null
+  },
   createdAt: {
     type: Date,
     default: Date.now

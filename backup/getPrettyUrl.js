@@ -1,8 +1,14 @@
 const getPrettyUrl = (uglyUrl, logger) => {
+  // Return original URL if no input provided
+  if (!uglyUrl) {
+    return "";
+  }
+
   const base64Match = uglyUrl.match(/\/read\/([A-Za-z0-9-_]+)/);
   if (!base64Match) {
-    return [];
+    return uglyUrl; // Return original URL if no base64 found
   }
+  
   const base64String = base64Match[1];
   try {
     const decodedString = Buffer.from(base64String, "base64").toString("ascii");
@@ -17,11 +23,11 @@ const getPrettyUrl = (uglyUrl, logger) => {
     });
     const uniqueUrls = [...new Set(urls)];
     const finalUrl = uniqueUrls.length ? uniqueUrls[0] : uglyUrl;
-    logger.info(finalUrl);
+    logger.info(`Pretty URL: ${finalUrl}`);
     return finalUrl;
   } catch (error) {
-    logger.error(error);
-    return [];
+    logger.error(`Error decoding URL: ${error}`);
+    return uglyUrl; // Return original URL if decoding fails
   }
 }
 
