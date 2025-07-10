@@ -48,7 +48,7 @@ The output is an array of JSON objects, with each article following the structur
         "link":  "http://url-to-website.com/path/to/article",
         "image":"http://url-to-website.com/path/to/image.jpg",
         "source":  "Name of publication",
-        "datetime": 2024-05-13T08:02:22.000Z,
+        "datetime": "2024-05-13T08:02:22.000Z",
         "time":  "Time/date published (human-readable)", 
         "articleType": "String, one of ['regular' | 'topicFeatured' | 'topicSmall']"
     }
