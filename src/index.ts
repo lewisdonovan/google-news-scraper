@@ -140,4 +140,4 @@ const googleNewsScraper = async (userConfig: GNSUserConfig) => {
 }
 
 export * from "./types";
-export default googleNewsScraper;
+export default googleNewsScraper; 
