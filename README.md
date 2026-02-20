@@ -4,12 +4,28 @@ A lightweight package that scrapes article data from [Google News](https://news.
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://donate.stripe.com/6oE7ue8n57wk4PS7ss)
 
- ![Google News Scraper](https://repository-images.githubusercontent.com/236499568/08f79682-be8e-4625-b84d-7d6ad86bd2d8)
+<!-- ![Google News Scraper](https://repository-images.githubusercontent.com/236499568/08f79682-be8e-4625-b84d-7d6ad86bd2d8) -->
+
+---
+## Enterprise-Grade Google News API (sponsored)
+
+<p align="">
+  <a href="https://hasdata.com/apis/google-news-api" target="_blank" rel="noopener nofollow">
+    <img width="266" height="100" alt="HasData logo" src="https://github.com/user-attachments/assets/10151d36-86ae-4867-a287-fcf67bb2663e" />
+  </a>
+</p>
+
+[HasData's Google News API](https://hasdata.com/apis/google-news-api) returns structured data in 1.75 seconds. No proxies, CAPTCHAs, or headless browsers to maintain. Start with 1,000 free API calls.
+
+---
+
+
 
 * [Installation](#installation-)
 * [Usage](#usage-%EF%B8%8F)
 * [Output](#output-)
 * [Config](#config-%EF%B8%8F)
+
 * [TypeScript](#typescript-)
 * [CommonJS](#common-js-)
 * [Performance](#performance-)
