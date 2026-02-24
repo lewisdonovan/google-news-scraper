@@ -19,6 +19,7 @@ export type GNSUserConfig = SearchParams & {
   queryVars?: QueryVars;
   filterWords?: string[];
   limit?: number;
+  rotatingProxies?: string[];
 };
 
 export type GNSConfig = SearchParams & {
@@ -31,6 +32,7 @@ export type GNSConfig = SearchParams & {
   queryVars: QueryVars;
   filterWords?: string[];
   limit: number;
+  rotatingProxies?: string[];
 };
 
 export type Article = {
@@ -52,6 +54,7 @@ export interface GetArticleContentProps {
   browser: Browser;
   filterWords: string[];
   logger: winston.Logger;
+  rotatingProxies?: string[];
 }
 
 export interface ExtractArticleContentAndFaviconProps {
@@ -59,6 +62,7 @@ export interface ExtractArticleContentAndFaviconProps {
   browser: Browser;
   filterWords: string[];
   logger: winston.Logger;
+  proxy?: string;
 }
 
 // declare const googleNewsScraper: (userConfig: GNSUserConfig) => Promise<Article[]>;
