@@ -1,7 +1,7 @@
 {
   "name": "google-news-scraper",
-  "version": "2.0.1",
-  "description": "Lightweight async scraper for Google News",
+  "version": "2.0.2",
+  "description": "Lightweight TypeScript scraper for Google News",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.mjs",
   "types": "./dist/tsc/index.d.ts",
