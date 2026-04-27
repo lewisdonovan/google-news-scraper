@@ -11,7 +11,7 @@ A lightweight package that scrapes article data from [Google News](https://news.
 
 <p align="">
   <a href="https://hasdata.com/apis/google-news-api" target="_blank" rel="noopener nofollow">
-    <img width="266" height="100" alt="HasData logo" src="https://github.com/user-attachments/assets/10151d36-86ae-4867-a287-fcf67bb2663e" />
+    <img width="266" height="100" alt="HasData logo" src="https://lewisdonovan.dev/images/projects/hasdata.png" />
   </a>
 </p>
 
@@ -23,7 +23,7 @@ A lightweight package that scrapes article data from [Google News](https://news.
 
 <p align="">
   <a href="https://serpapi.com/use-cases/news-monitoring?umt_source=lewisdonovan" target="_blank" rel="noopener nofollow">
-    <img height="100" alt="SerpAPI logo" src="https://github.com/user-attachments/assets/babd0c17-f75d-43be-af7a-a4e72ed59a4f" style="margin:0;" />
+    <img height="100" alt="SerpAPI logo" src="https://lewisdonovan.dev/images/projects/serpapi.png" style="margin:0;" />
   </a>
 </p>
 
