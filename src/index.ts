@@ -25,7 +25,8 @@ const googleNewsScraper = async (userConfig: GNSUserConfig) => {
       logLevel: 'error',
       timeframe: '7d',
       queryVars: {}, 
-      limit: 99
+      limit: 99,
+      rotatingProxies: null,
     },
     ...userConfig,
   } as GNSConfig;
@@ -128,7 +129,7 @@ const googleNewsScraper = async (userConfig: GNSUserConfig) => {
 
   if (config.getArticleContent) {
     const filterWords = config.filterWords || [];
-    results = await getArticleContent({articles: results, browser, filterWords, logger});
+    results = await getArticleContent({articles: results, browser, filterWords, logger, rotatingProxies: config.rotatingProxies});
   }
 
   await page.close();

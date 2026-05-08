@@ -1,6 +1,7 @@
 import { Readability } from '@mozilla/readability';
 import { JSDOM, VirtualConsole } from 'jsdom';
 import { Article, Articles, ExtractArticleContentAndFaviconProps, GetArticleContentProps } from "./types"
+import { proxyRequest } from 'puppeteer-proxy';
 
 const verifyMessages = [
   "you are human", 
@@ -9,12 +10,27 @@ const verifyMessages = [
   "recaptcha"
 ];
 
+function* cycle(arr: string[]): Generator<string, undefined, unknown> {
+  while (true) {
+      for (let i = 0; i < arr.length; i++) {
+          yield arr[i];
+      }
+  }
+}
+
+const cycleProxies = (iterableProxies?: Generator<string, undefined, unknown>) => {
+  if (!iterableProxies)  return;
+  return iterableProxies.next().value;
+}
+
+
 const getArticleContent = async ({
-  articles, browser, filterWords, logger
+  articles, browser, filterWords, logger, rotatingProxies
 }: GetArticleContentProps): Promise<Articles> => {
   try {
+    const iterableProxies = rotatingProxies?.length ? cycle(rotatingProxies) : undefined;
     const processedArticlesPromises = articles.map(article =>
-      extractArticleContentAndFavicon({article, browser, filterWords, logger})
+      extractArticleContentAndFavicon({article, browser, filterWords, logger, proxy: cycleProxies(iterableProxies)})
     );
 
     const processedArticles = await Promise.all(processedArticlesPromises);
@@ -28,10 +44,20 @@ const getArticleContent = async ({
 }
 
 const extractArticleContentAndFavicon = async ({
-  article, browser, filterWords, logger
+  article, browser, filterWords, logger, proxy
 }: ExtractArticleContentAndFaviconProps): Promise<Article> => {
   try {
     const page = await browser.newPage();
+    if (proxy) {
+      await page.setRequestInterception(true);
+      page.on('request', async (request) => {
+        await proxyRequest({
+          page,
+          proxyUrl: proxy,
+          request,
+        });
+      });
+    }
     await page.goto(article.link, { waitUntil: 'networkidle2' });
     const content = await page.evaluate(() => document.documentElement.innerHTML);
 

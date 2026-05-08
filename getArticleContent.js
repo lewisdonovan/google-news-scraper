@@ -1,6 +1,9 @@
 const { Readability } = require('@mozilla/readability');
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
+const {
+  proxyRequest,
+} = require('puppeteer-proxy');
 
 const verifyMessages = [
   "you are human", 
@@ -9,10 +12,26 @@ const verifyMessages = [
   "recaptcha"
 ];
 
-const getArticleContent = async (articles, browser, filterWords, logger) => {
+
+function* cycle(arr) {
+  while (true) {
+      for (let i = 0; i < arr.length; i++) {
+          yield arr[i];
+      }
+  }
+}
+
+const cycleProxies = (iterableProxies = null) => {
+  if (!iterableProxies)  return null;
+  return iterableProxies.next().value;
+}
+
+
+const getArticleContent = async (articles, browser, filterWords, logger, rotatingProxies) => {
   try {
+    const iterableProxies = rotatingProxies?.length ? cycle(rotatingProxies) : null;
     const processedArticlesPromises = articles.map(article =>
-      extractArticleContentAndFavicon(article, browser, filterWords, logger)
+      extractArticleContentAndFavicon(article, browser, filterWords, logger, cycleProxies(iterableProxies))
     );
 
     const processedArticles = await Promise.all(processedArticlesPromises);
@@ -25,9 +44,19 @@ const getArticleContent = async (articles, browser, filterWords, logger) => {
   }
 }
 
-const extractArticleContentAndFavicon = async (article, browser, filterWords, logger) => {
+const extractArticleContentAndFavicon = async (article, browser, filterWords, logger, proxy = null) => {
   try {
     const page = await browser.newPage();
+    if (proxy) {
+      await page.setRequestInterception(true);
+      page.on('request', async (request) => {
+        await proxyRequest({
+          page,
+          proxyUrl: proxy,
+          request,
+        });
+      });
+    }
     await page.goto(article.link, { waitUntil: 'networkidle2' });
     const content = await page.evaluate(() => document.documentElement.innerHTML);
 
