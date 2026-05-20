@@ -30,8 +30,8 @@ const getArticleContent = async ({
 const extractArticleContentAndFavicon = async ({
   article, browser, filterWords, logger
 }: ExtractArticleContentAndFaviconProps): Promise<Article> => {
+  const page = await browser.newPage();
   try {
-    const page = await browser.newPage();
     await page.goto(article.link, { waitUntil: 'networkidle2' });
     const content = await page.evaluate(() => document.documentElement.innerHTML);
 
@@ -59,7 +59,7 @@ const extractArticleContentAndFavicon = async ({
     }
 
     const cleanedText = cleanText(articleContent.textContent, filterWords);
-    
+
     if (cleanedText.split(' ').length < 100) { // Example threshold: 100 words
       logger.warn("Article content is too short and likely not valuable.", {article});
       return { ...article, content: '', favicon };
@@ -70,6 +70,8 @@ const extractArticleContentAndFavicon = async ({
   } catch (error) {
     logger.error(error);
     return { ...article, content: '', favicon: '' };
+  } finally {
+    await page.close();
   }
 }
 

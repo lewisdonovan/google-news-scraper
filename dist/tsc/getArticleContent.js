@@ -28,8 +28,8 @@ const getArticleContent = (_a) => __awaiter(void 0, [_a], void 0, function* ({ a
 });
 const extractArticleContentAndFavicon = (_a) => __awaiter(void 0, [_a], void 0, function* ({ article, browser, filterWords, logger }) {
     var _b;
+    const page = yield browser.newPage();
     try {
-        const page = yield browser.newPage();
         yield page.goto(article.link, { waitUntil: 'networkidle2' });
         const content = yield page.evaluate(() => document.documentElement.innerHTML);
         const favicon = (_b = yield page.evaluate(() => {
@@ -61,6 +61,9 @@ const extractArticleContentAndFavicon = (_a) => __awaiter(void 0, [_a], void 0, 
     catch (error) {
         logger.error(error);
         return Object.assign(Object.assign({}, article), { content: '', favicon: '' });
+    }
+    finally {
+        yield page.close();
     }
 });
 const cleanText = (text, filterWords) => {
