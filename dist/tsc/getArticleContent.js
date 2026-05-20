@@ -45,7 +45,7 @@ const extractArticleContentAndFavicon = (_a) => __awaiter(void 0, [_a], void 0, 
             logger.warn("Article content could not be parsed or is empty.", { article });
             return Object.assign(Object.assign({}, article), { content: '', favicon });
         }
-        const hasVerifyMessage = verifyMessages.find(w => articleContent.textContent.toLowerCase().includes(w));
+        const hasVerifyMessage = verifyMessages.find(w => { var _a; return ((_a = articleContent.textContent) !== null && _a !== void 0 ? _a : '').toLowerCase().includes(w); });
         if (hasVerifyMessage) {
             logger.warn("Article requires human verification.", { article });
             return Object.assign(Object.assign({}, article), { content: '', favicon });
