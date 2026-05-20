@@ -2,37 +2,44 @@
 
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
+const winston = require('winston');
 
-const getLogger = require('./logger');
-const getTitle = require('./getTitle').default;
-const getArticleType = require('./getArticleType').default;
-const getPrettyUrl = require('./getPrettyUrl').default;
-const buildQueryString = require('./buildQueryString').default;
+const buildQueryString = require('./buildQueryString');
+const getArticleType = require('./getArticleType');
 const getArticleContent = require('./getArticleContent').default;
+const getPrettyUrl = require('./getPrettyUrl');
+const getTitle = require('./getTitle');
+const getLogger = require('./getLogger').default;
 
 const googleNewsScraper = async (userConfig) => {
-
-  const config = Object.assign({
-    prettyURLs: true,
-    getArticleContent: false,
-    puppeteerArgs: [],
-    puppeteerHeadlessMode: true, 
-    logLevel: 'error',
-  }, userConfig);
+  const config = Object.assign(
+    {
+      prettyURLs: true,
+      getArticleContent: false,
+      puppeteerArgs: [],
+      puppeteerHeadlessMode: true,
+      logLevel: 'error',
+      timeframe: '7d',
+      queryVars: {},
+      limit: 99
+    },
+    userConfig
+  );
 
   const logger = getLogger(config.logLevel);
 
-  let queryVars = config.queryVars || {};
+  let queryVars = config.queryVars
+    ? Object.assign({}, config.queryVars, { when: config.timeframe })
+    : { when: config.timeframe };
   if (userConfig.searchTerm) {
     queryVars.q = userConfig.searchTerm;
   }
 
-  const queryString = queryVars ? buildQueryString(queryVars) : ''
-  const baseUrl = config.baseUrl ?? `https://news.google.com/search`
-  const timeString = config.timeframe ? ` when:${config.timeframe}` : ''
-  const url = `${baseUrl}${queryString}${timeString}`
+  const queryString = buildQueryString(queryVars) || '';
+  const baseUrl = config.baseUrl || 'https://news.google.com/search';
+  const url = `${baseUrl}${queryString}`;
 
-  logger.info(`📰 SCRAPING NEWS FROM: ${url}`);
+  logger.info(`\u{1F4F0} SCRAPING NEWS FROM: ${url}`);
   const requiredArgs = [
     '--disable-extensions-except=/path/to/manifest/folder/',
     '--load-extension=/path/to/manifest/folder/',
@@ -44,7 +51,7 @@ const googleNewsScraper = async (userConfig) => {
   const browser = await puppeteer.launch(puppeteerConfig)
   const page = await browser.newPage()
   page.setViewport({ width: 1366, height: 768 })
-  page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36')
+  page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36')
   page.setRequestInterception(true)
   page.on('request', request => {
     if (!request.isNavigationRequest()) {
@@ -67,9 +74,9 @@ const googleNewsScraper = async (userConfig) => {
   await page.goto(url, { waitUntil: 'networkidle2' });
 
   try {
-    await page.$(`[aria-label="Reject all"]`);
+    await page.$('[aria-label="Reject all"]');
     await Promise.all([
-      page.click(`[aria-label="Reject all"]`),
+      page.click('[aria-label="Reject all"]'),
       page.waitForNavigation({ waitUntil: 'networkidle2' })
     ]);
   } catch (err) {}
@@ -78,26 +85,27 @@ const googleNewsScraper = async (userConfig) => {
   const $ = cheerio.load(content);
 
   const articles = $('article');
-  let results = []
-  let i = 0
-  const urlChecklist = []
+  let results = [];
+  let i = 0;
+  const urlChecklist = [];
 
-  $(articles).each(function () {
-    const link = $(this)?.find('a[href^="./article"]')?.attr('href')?.replace('./', 'https://news.google.com/') || $(this)?.find('a[href^="./read"]')?.attr('href')?.replace('./', 'https://news.google.com/') || false
+  $(articles).each(function() {
+    const link = $(this).find('a[href^="./article"]').attr('href') ? $(this).find('a[href^="./article"]').attr('href').replace('./', 'https://news.google.com/') : $(this).find('a[href^="./read"]').attr('href') ? $(this).find('a[href^="./read"]').attr('href').replace('./', 'https://news.google.com/') : ""
     link && urlChecklist.push(link);
-    const srcset = $(this).find('figure').find('img').attr('srcset')?.split(' ');
-    const image = srcset && srcset.length
-      ? srcset[srcset.length - 2]
+    const srcset = $(this).find('figure').find('img').attr('srcset');
+    const image = srcset && srcset.split(' ').length
+      ? srcset.split(' ')[srcset.split(' ').length - 2]
       : $(this).find('figure').find('img').attr('src');
-    const articleType = getArticleType($, this);
-    const title = getTitle($, this, articleType);
+    const articleType = getArticleType($(this));
+
+    const title = getTitle($(this), articleType);
     const mainArticle = {
-      title, 
-      "link": link,
-      "image": image?.startsWith("/") ? `https://news.google.com${image}` : image,
-      "source": $(this).find('div[data-n-tid]').text() || false,
-      "datetime": new Date($(this).find('div:last-child time').attr('datetime')) || false,
-      "time": $(this).find('div:last-child time').text() || false, 
+      title,
+      link: link,
+      image: image && image.startsWith('/') ? `https://news.google.com${image}` : image || "",
+      source: $(this).find('div[data-n-tid]').text() || "",
+      datetime: new Date($(this).find('div:last-child time').attr('datetime') || "").toISOString() || "",
+      time: $(this).find('div:last-child time').text() || "",
       articleType
     }
     results.push(mainArticle)
@@ -107,21 +115,24 @@ const googleNewsScraper = async (userConfig) => {
   if (config.prettyURLs) {
     results = await Promise.all(results.map(article => {
       const url = getPrettyUrl(article.link, logger);
-      article.link = url;
+      if (url) {
+        article.link = url;
+      }
       return article;
     }));
   }
 
   if (config.getArticleContent) {
     const filterWords = config.filterWords || [];
-    results = await getArticleContent(results, browser, filterWords, logger);
+    results = await getArticleContent({ articles: results, browser, filterWords, logger });
   }
 
   await page.close();
   await browser.close()
 
-  return results.filter(result => result.title)
-
+  const filtered = results.filter(result => result.title);
+  return config.limit < results.length ? filtered.slice(0, config.limit) : filtered;
 }
 
 module.exports = googleNewsScraper;
+module.exports.default = googleNewsScraper;

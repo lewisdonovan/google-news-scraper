@@ -1,16 +1,12 @@
 'use strict'
 
 const buildQueryString = (query) => {
-  // Sanity check
-  if (
-    !query ||
-    typeof query !== 'object' ||
-    Object.keys(query).length === 0
-  ) {
-    return ''
-  }
+
+  // Bail if there's nothing in the Object
+  if (!query || Object.keys(query).length === 0) return "";
+
   // Build query string
-  // Example: { q: 'puppies', hl: 'en', gl: 'US' } => '?q=puppies&hl=en&gl=US'
+  // Example: { q: 'zapatos', gl: 'ES', ceid: "es:es" } => '?q=zapatos&gl=ES&ceid=ES:es'
   const queryString = Object.keys(query).reduce((acc, key, index) => {
     const prefix = index === 0 ? '?' : '&'
     return `${acc}${prefix}${key}=${query[key]}`
@@ -19,6 +15,4 @@ const buildQueryString = (query) => {
   return queryString
 }
 
-module.exports = {
-  default: buildQueryString
-}
+module.exports = buildQueryString

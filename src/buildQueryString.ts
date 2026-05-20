@@ -3,7 +3,7 @@ import { QueryVars } from "./types"
 const buildQueryString = ( query: QueryVars ) => {
   
   // Bail if there's nothing in the Object
-  if (Object.keys(query).length === 0) return "";
+  if (!query || Object.keys(query).length === 0) return "";
   
   // Build query string
   // Example: { q: 'zapatos', gl: 'ES', ceid: "es:es" } => '?q=zapatos&gl=ES&ceid=ES:es'

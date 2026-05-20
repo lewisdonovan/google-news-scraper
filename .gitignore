@@ -1,3 +1,7 @@
 node_modules/
 
 run/
+
+# Claude memory
+MEMORY.md
+memory/

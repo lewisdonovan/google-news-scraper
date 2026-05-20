@@ -55,11 +55,11 @@ const getTitle = (article, articleType) => {
     try {
         switch (articleType) {
             case "regular":
-                return article.find('h4').text() || article.find('div > div + div > div a').text() || "";
+                return (article.find('h4').text() || article.find('div > div + div > div a').text() || "").trim() || "";
             case "topicFeatured":
-                return article.find('a[target=_blank]').text() || ((_a = article.find('button').attr('aria-label')) === null || _a === void 0 ? void 0 : _a.replace('More - ', '')) || "";
+                return (article.find('a[target=_blank]').text() || ((_a = article.find('button').attr('aria-label')) === null || _a === void 0 ? void 0 : _a.replace('More - ', '')) || "").trim() || "";
             case "topicSmall":
-                return article.find('a[target=_blank]').text() || ((_b = article.find('button').attr('aria-label')) === null || _b === void 0 ? void 0 : _b.replace('More - ', '')) || "";
+                return (article.find('a[target=_blank]').text() || ((_b = article.find('button').attr('aria-label')) === null || _b === void 0 ? void 0 : _b.replace('More - ', '')) || "").trim() || "";
             default:
                 return "";
         }
@@ -111,7 +111,7 @@ const getPrettyUrl = (uglyUrl, logger) => {
 
 const buildQueryString = (query) => {
     // Bail if there's nothing in the Object
-    if (Object.keys(query).length === 0)
+    if (!query || Object.keys(query).length === 0)
         return "";
     // Build query string
     // Example: { q: 'zapatos', gl: 'ES', ceid: "es:es" } => '?q=zapatos&gl=ES&ceid=ES:es'
@@ -3074,6 +3074,54 @@ function requireReadability () {
 
 var readabilityExports = requireReadability();
 
+const unwantedKeywords = [
+    "subscribe now",
+    "sign up",
+    "newsletter",
+    "sign up for our newsletter",
+    "exclusive offer",
+    "limited time offer",
+    "free trial",
+    "download now",
+    "join now",
+    "register today",
+    "special promotion",
+    "promotional offer",
+    "discount code",
+    "early access",
+    "sneak peek",
+    "save now",
+    "don't miss out",
+    "act now",
+    "last chance",
+    "expires soon",
+    "giveaway",
+    "free access",
+    "premium access",
+    "unlock full access",
+    "buy now",
+    "learn more",
+    "click here",
+    "follow us on",
+    "share this article",
+    "connect with us",
+    "advertisement",
+    "sponsored content",
+    "partner content",
+    "affiliate links",
+    "for more information",
+    "you may also like",
+    "we think you'll like",
+    "from our network",
+];
+const cleanText = (text, filterWords) => text
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line.split(' ').length > 4)
+    .filter(line => !unwantedKeywords.some(keyword => line.toLowerCase().includes(keyword)))
+    .filter(line => !filterWords.some(word => line.toLowerCase().includes(word)))
+    .join('\n');
+
 var __awaiter$1 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -3124,8 +3172,8 @@ const extractArticleContentAndFavicon = (_a) => __awaiter$1(void 0, [_a], void 0
             logger.warn("Article requires human verification.", { article });
             return Object.assign(Object.assign({}, article), { content: '', favicon });
         }
-        const cleanedText = cleanText(articleContent.textContent, filterWords);
-        if (cleanedText.split(' ').length < 100) { // Example threshold: 100 words
+        const cleanedText = cleanText(articleContent.textContent, filterWords || []);
+        if (cleanedText.split(' ').length < 100) {
             logger.warn("Article content is too short and likely not valuable.", { article });
             return Object.assign(Object.assign({}, article), { content: '', favicon });
         }
@@ -3140,57 +3188,6 @@ const extractArticleContentAndFavicon = (_a) => __awaiter$1(void 0, [_a], void 0
         yield page.close();
     }
 });
-const cleanText = (text, filterWords) => {
-    const unwantedKeywords = [
-        "subscribe now",
-        "sign up",
-        "newsletter",
-        "subscribe now",
-        "sign up for our newsletter",
-        "exclusive offer",
-        "limited time offer",
-        "free trial",
-        "download now",
-        "join now",
-        "register today",
-        "special promotion",
-        "promotional offer",
-        "discount code",
-        "early access",
-        "sneak peek",
-        "save now",
-        "don't miss out",
-        "act now",
-        "last chance",
-        "expires soon",
-        "giveaway",
-        "free access",
-        "premium access",
-        "unlock full access",
-        "buy now",
-        "learn more",
-        "click here",
-        "follow us on",
-        "share this article",
-        "connect with us",
-        "advertisement",
-        "sponsored content",
-        "partner content",
-        "affiliate links",
-        "click here",
-        "for more information",
-        "you may also like",
-        "we think you'll like",
-        "from our network",
-        ...filterWords
-    ];
-    return text
-        .split('\n')
-        .map(line => line.trim())
-        .filter(line => line.split(' ').length > 4)
-        .filter(line => !unwantedKeywords.some(keyword => line.toLowerCase().includes(keyword)))
-        .join('\n');
-};
 
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }

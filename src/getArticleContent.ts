@@ -1,11 +1,12 @@
 import { Readability } from '@mozilla/readability';
 import { JSDOM, VirtualConsole } from 'jsdom';
 import { Article, Articles, ExtractArticleContentAndFaviconProps, GetArticleContentProps } from "./types"
+import { cleanText } from "./cleanText"
 
 const verifyMessages = [
-  "you are human", 
-  "are you human", 
-  "i'm not a robot", 
+  "you are human",
+  "are you human",
+  "i'm not a robot",
   "recaptcha"
 ];
 
@@ -58,9 +59,9 @@ const extractArticleContentAndFavicon = async ({
       return { ...article, content: '', favicon};
     }
 
-    const cleanedText = cleanText(articleContent.textContent, filterWords);
+    const cleanedText = cleanText(articleContent.textContent, filterWords || []);
 
-    if (cleanedText.split(' ').length < 100) { // Example threshold: 100 words
+    if (cleanedText.split(' ').length < 100) {
       logger.warn("Article content is too short and likely not valuable.", {article});
       return { ...article, content: '', favicon };
     }
@@ -73,58 +74,6 @@ const extractArticleContentAndFavicon = async ({
   } finally {
     await page.close();
   }
-}
-
-const cleanText = (text: string, filterWords: string[]) => {
-  const unwantedKeywords = [
-    "subscribe now",
-    "sign up",
-    "newsletter",
-    "subscribe now",
-    "sign up for our newsletter",
-    "exclusive offer",
-    "limited time offer",
-    "free trial",
-    "download now",
-    "join now",
-    "register today",
-    "special promotion",
-    "promotional offer",
-    "discount code",
-    "early access",
-    "sneak peek",
-    "save now",
-    "don't miss out",
-    "act now",
-    "last chance",
-    "expires soon",
-    "giveaway",
-    "free access",
-    "premium access",
-    "unlock full access",
-    "buy now",
-    "learn more",
-    "click here",
-    "follow us on",
-    "share this article",
-    "connect with us",
-    "advertisement",
-    "sponsored content",
-    "partner content",
-    "affiliate links",
-    "click here",
-    "for more information", 
-    "you may also like", 
-    "we think you'll like", 
-    "from our network", 
-    ...filterWords
-  ];
-  return text
-    .split('\n')
-    .map(line => line.trim())
-    .filter(line => line.split(' ').length > 4)
-    .filter(line => !unwantedKeywords.some(keyword => line.toLowerCase().includes(keyword)))
-    .join('\n');
 }
 
 export default getArticleContent;

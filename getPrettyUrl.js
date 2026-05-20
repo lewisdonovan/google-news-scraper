@@ -1,7 +1,9 @@
+'use strict'
+
 const getPrettyUrl = (uglyUrl, logger) => {
   const base64Match = uglyUrl.match(/\/read\/([A-Za-z0-9-_]+)/);
   if (!base64Match) {
-    return [];
+    return null;
   }
   const base64String = base64Match[1];
   try {
@@ -21,10 +23,8 @@ const getPrettyUrl = (uglyUrl, logger) => {
     return finalUrl;
   } catch (error) {
     logger.error(error);
-    return [];
+    return null;
   }
 }
 
-module.exports = {
-  default: getPrettyUrl
-}
+module.exports = getPrettyUrl
