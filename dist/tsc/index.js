@@ -48,7 +48,7 @@ const googleNewsScraper = (userConfig) => __awaiter(void 0, void 0, void 0, func
     const browser = yield puppeteer.launch(puppeteerConfig);
     const page = yield browser.newPage();
     page.setViewport({ width: 1366, height: 768 });
-    page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36');
+    page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36');
     page.setRequestInterception(true);
     page.on('request', request => {
         if (!request.isNavigationRequest()) {

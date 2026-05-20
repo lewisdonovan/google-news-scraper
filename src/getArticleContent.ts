@@ -52,7 +52,7 @@ const extractArticleContentAndFavicon = async ({
       return { ...article, content: '', favicon};
     }
 
-    const hasVerifyMessage = verifyMessages.find(w => articleContent.textContent.toLowerCase().includes(w));
+    const hasVerifyMessage = verifyMessages.find(w => (articleContent.textContent ?? '').toLowerCase().includes(w));
     if (hasVerifyMessage) {
       logger.warn("Article requires human verification.", {article});
       return { ...article, content: '', favicon};
