@@ -22,12 +22,12 @@ A lightweight package that scrapes article data from [Google News](https://news.
 ## SerpApi - The News Monitoring API (sponsored)
 
 <p align="">
-  <a href="https://serpapi.com/use-cases/news-monitoring?umt_source=lewisdonovan" target="_blank" rel="noopener nofollow">
+  <a href="https://serpapi.com/use-cases/news-monitoring?utm_source=lewisdonovan" target="_blank" rel="noopener nofollow">
     <img height="100" alt="SerpAPI logo" src="https://lewisdonovan.dev/images/projects/serpapi.png" style="margin:0;" />
   </a>
 </p>
 
-[SerpApi - The News Monitoring API](https://serpapi.com/use-cases/news-monitoring?umt_source=lewisdonovan). We help you access real-time search engine data via a simple API, which includes news from Google, Bing, and DuckDuckGo. 
+[SerpApi - The News Monitoring API](https://serpapi.com/use-cases/news-monitoring?utm_source=lewisdonovan). We help you access real-time search engine data via a simple API, which includes news from Google, Bing, and DuckDuckGo. 
 
 ---
 
