@@ -34,7 +34,9 @@
     "crawler",
     "web crawler",
     "news crawler",
-    "google crawler"
+    "google crawler", 
+    "scrape google news", 
+    "google news API"
   ],
   "author": "Lewis Donovan",
   "license": "SEE LICENSE IN LICENSE.txt",
