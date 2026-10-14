@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - master
+permissions:
+  contents: write # commit the version bump and changelog, push the tag
+  id-token: write # npm trusted publishing (no NPM_TOKEN needed)
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -12,15 +15,19 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # Trusted publishing needs npm 11.5.1 or later, which ships with Node 24
+          node-version: 24
       - name: Install Dependencies
-        run: npm i
+        run: npm ci
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'true'
       - name: Build
         run: npm run build:ci
       - name: Verify Build Output
         run: ls -R dist
+      - name: Test
+        run: npx jest
       - name: Semantic release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npx semantic-release
