@@ -3,6 +3,7 @@ import buildFeedUrl from './buildFeedUrl';
 import parseFeed from './parseFeed';
 import getPrettyUrl from './getPrettyUrl';
 import mapLimit from './mapLimit';
+import fetchWithRetry from './fetchWithRetry';
 import getArticleContent from './getArticleContent';
 import {
   GNSUserConfig,
@@ -35,9 +36,8 @@ const googleNewsScraper = async (userConfig: GNSUserConfig): Promise<Articles> =
 
   let xml: string;
   try {
-    const response = await fetch(url, {
+    const response = await fetchWithRetry(url, {
       headers: { 'User-Agent': USER_AGENT, 'Accept-Language': 'en-US,en;q=0.9' },
-      signal: AbortSignal.timeout(30000),
     });
     if (!response.ok) {
       logger.error(`Google News responded with ${response.status} for ${url}`);

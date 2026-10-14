@@ -7,6 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+import fetchWithRetry from "./fetchWithRetry";
 const USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36';
 const TIMEOUT_MS = 15000;
 export const getArticleId = (googleUrl) => {
@@ -25,10 +26,9 @@ export const decodeLegacyId = (id) => {
 // which needs a signature and timestamp scraped from the article's redirect page
 const decodeWithGoogle = (id) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
-    const page = yield fetch(`https://news.google.com/rss/articles/${id}`, {
+    const page = yield fetchWithRetry(`https://news.google.com/rss/articles/${id}`, {
         headers: { 'User-Agent': USER_AGENT },
-        signal: AbortSignal.timeout(TIMEOUT_MS),
-    });
+    }, { attempts: 2, timeoutMs: TIMEOUT_MS });
     const html = yield page.text();
     const signature = (_a = html.match(/data-n-a-sg="([^"]+)"/)) === null || _a === void 0 ? void 0 : _a[1];
     const timestamp = (_b = html.match(/data-n-a-ts="([^"]+)"/)) === null || _b === void 0 ? void 0 : _b[1];
@@ -39,12 +39,11 @@ const decodeWithGoogle = (id) => __awaiter(void 0, void 0, void 0, function* () 
         [['X', 'X', ['X', 'X'], null, null, 1, 1, 'US:en', null, 1, null, null, null, null, null, 0, 1], 'X', 'X', 1, [1, 1, 1], 1, 1, null, 0, 0, null, 0],
         id, Number(timestamp), signature,
     ]);
-    const response = yield fetch('https://news.google.com/_/DotsSplashUi/data/batchexecute', {
+    const response = yield fetchWithRetry('https://news.google.com/_/DotsSplashUi/data/batchexecute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'User-Agent': USER_AGENT },
         body: 'f.req=' + encodeURIComponent(JSON.stringify([[['Fbv4je', payload, null, 'generic']]])),
-        signal: AbortSignal.timeout(TIMEOUT_MS),
-    });
+    }, { attempts: 2, timeoutMs: TIMEOUT_MS });
     const text = yield response.text();
     const json = JSON.parse(text.slice(text.indexOf('[')));
     const result = JSON.parse(json[0][2]);

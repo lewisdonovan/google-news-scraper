@@ -14,7 +14,7 @@ const mockGoogle = ({ feed = feedXml, feedOk = true } = {}) => {
   global.fetch = jest.fn(async (url) => {
     if (url.includes('batchexecute')) return respond(batchResponse('https://publisher.example/story'))
     if (url.includes('/rss/articles/')) return respond(articlePage('SIG', '1791993031'))
-    return respond(feed, feedOk, feedOk ? 200 : 503)
+    return respond(feed, feedOk, feedOk ? 200 : 404)
   })
 }
 
