@@ -1,3 +1,10 @@
+## [3.0.3](https://github.com/lewisdonovan/google-news-scraper/compare/v3.0.2...v3.0.3) (2026-10-14)
+
+
+### Bug Fixes
+
+* drop unused build dependency and expose package.json ([3b19e87](https://github.com/lewisdonovan/google-news-scraper/commit/3b19e877f6f55eda98b08b093a1320ef61b6d983))
+
 ## [3.0.2](https://github.com/lewisdonovan/google-news-scraper/compare/v3.0.1...v3.0.2) (2026-10-14)
 
 
