@@ -1,3 +1,10 @@
+## [3.0.2](https://github.com/lewisdonovan/google-news-scraper/compare/v3.0.1...v3.0.2) (2026-10-14)
+
+
+### Bug Fixes
+
+* license under MIT ([4dac517](https://github.com/lewisdonovan/google-news-scraper/commit/4dac5176873cf3d3816892f652b5c873e1243800))
+
 ## [3.0.1](https://github.com/lewisdonovan/google-news-scraper/compare/v3.0.0...v3.0.1) (2026-10-14)
 
 

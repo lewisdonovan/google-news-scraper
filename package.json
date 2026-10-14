@@ -1,6 +1,6 @@
 {
   "name": "google-news-scraper",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Scrape Google News search results, topics and top stories as JSON. No headless browser, works on serverless, TypeScript types included.",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.mjs",
