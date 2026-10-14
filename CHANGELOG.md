@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/lewisdonovan/google-news-scraper/compare/v3.0.0...v3.0.1) (2026-10-14)
+
+
+### Bug Fixes
+
+* retry Google News requests that fail with 429 or 5xx ([e4492d4](https://github.com/lewisdonovan/google-news-scraper/commit/e4492d429613da74a11094d5559dc8a7ae3436c0)), closes [#73](https://github.com/lewisdonovan/google-news-scraper/issues/73)
+
 # [3.0.0](https://github.com/lewisdonovan/google-news-scraper/compare/v2.7.1...v3.0.0) (2026-10-14)
 
 
