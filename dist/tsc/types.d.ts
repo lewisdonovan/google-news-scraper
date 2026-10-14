@@ -1,4 +1,4 @@
-import { Browser } from 'puppeteer';
+import type { Browser } from 'puppeteer';
 import winston from "winston";
 type Timeframe = `${number}${'h' | 'd' | 'm' | 'y'}`;
 export type LogLevel = 'none' | 'error' | 'warn' | 'info' | 'verbose';
@@ -42,6 +42,7 @@ export type Article = {
     articleType: string;
     content?: string;
     favicon?: string;
+    sourceUrl?: string;
 };
 export type Articles = Article[];
 export interface GetArticleContentProps {

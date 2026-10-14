@@ -1,0 +1,23 @@
+# Runs against the live Google News every day so breakages are caught before users report them.
+# A failed scheduled run emails the repository owner.
+name: Live smoke test
+on:
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+  pull_request:
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'true'
+      - run: npm run build:ts
+      - run: npx jest test/e2e
+        env:
+          E2E: '1'

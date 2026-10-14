@@ -41,6 +41,7 @@ A lightweight package that scrapes article data from [Google News](https://news.
 * [TypeScript](#typescript-)
 * [CommonJS](#common-js-)
 * [Performance](#performance-)
+* [Upgrading from v2](#upgrading-from-v2-)
 * [Upkeep](#upkeep-)
 * [Bugs](#bugs-)
 * [Contribute](#contribute-)
@@ -74,14 +75,17 @@ The output is an array of JSON objects, with each article following the structur
     {
         "title":  "Article title",
         "link":  "http://url-to-website.com/path/to/article",
-        "image":"http://url-to-website.com/path/to/image.jpg",
+        "image": "",
         "source":  "Name of publication",
+        "sourceUrl": "https://url-to-website.com",
         "datetime": "2024-05-13T08:02:22.000Z",
-        "time":  "Time/date published (human-readable)", 
-        "articleType": "String, one of ['regular' | 'topicFeatured' | 'topicSmall']"
+        "time":  "2 hours ago",
+        "articleType": "regular"
     }
 ]
 ```
+
+`image` is always an empty string, because Google News feeds don't include thumbnails. It's kept so code written for v2 doesn't break.
 
 ## Config ⚙️
 The config object passed to the function above has the following properties:
@@ -89,19 +93,15 @@ The config object passed to the function above has the following properties:
 #### searchTerm
 This is the search query you'd like to find articles for, simply pass the search string like so: `searchTerm: "The Oscars"`. 
 
-The search term is no longer a required field, as [hahagu](https://github.com/hahagu/) added support for topic pages in [#44](https://github.com/lewisdonovan/google-news-scraper/pull/44). If `searchTerm` and `baseUrl` are both supplied, the scraper will just return results from the [Google News homepage](https://news.google.com/).
+The search term is no longer a required field, as [hahagu](https://github.com/hahagu/) added support for topic pages in [#44](https://github.com/lewisdonovan/google-news-scraper/pull/44). If `searchTerm` and `baseUrl` are both supplied, `searchTerm` wins. If neither is supplied, you get the [Google News](https://news.google.com/) top stories.
 
 ### baseUrl
 The `baseUrl` property enables you to specify an alternate base URL for your search. This is useful when you want to scrape, for example, a specific [Google news topic](https://news.google.com/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGRqTVhZU0FtVnVHZ0pWVXlnQVAB). 
 
-***PLEASE NOTE***: Using both a `baseUrl` that points to a topic AND a `searchTerm` is not advised, as the `searchTerm` will typically be ignored in favour of the topic in the `baseUrl`.
-
-In the scraped URL, your `baseUrl` will be immediately followed by query parameters (eg: `?hl=en-US&gl=US&ceid=US`), so it doesn't matter whether your `baseUrl` has a trailing slash or not.
-
-Defaults to `https://news.google.com/search`
+The scraper reads the RSS version of whatever page you pass, so `https://news.google.com/topics/ABC` is fetched as `https://news.google.com/rss/topics/ABC`. If neither `searchTerm` nor `baseUrl` is supplied, you get the top stories.
 
 #### prettyURLs
-The URLs that Google News supplies for each article are "ugly" links (eg: `"https://news.google.com/articles/CAIiEPgfWP_e7PfrSwLwvWeb5msqFwgEKg8IACoHCAowjuuKAzCWrzwwt4QY?hl=en-GB&gl=GB&ceid=GB%3Aen"`), buy default the scraper will retrieve the actual "pretty" URL (eg: `"https://www.nytimes.com/2020/01/22/movies/expanded-best-picture-oscar.html"`). This is done using some base64 decoding, so the overhead is negligible. To prevent this default behaviour and retrieve the "ugly" links instead, pass `prettyURLs: false` to the config object.
+The URLs that Google News supplies for each article are "ugly" links (eg: `"https://news.google.com/articles/CAIiEPgfWP_e7PfrSwLwvWeb5msqFwgEKg8IACoHCAowjuuKAzCWrzwwt4QY?hl=en-GB&gl=GB&ceid=GB%3Aen"`), buy default the scraper will retrieve the actual "pretty" URL (eg: `"https://www.nytimes.com/2020/01/22/movies/expanded-best-picture-oscar.html"`). This takes two small requests to Google per article, run five at a time. To prevent this default behaviour and retrieve the "ugly" links instead, pass `prettyURLs: false` to the config object.
 
 Credit to [anthonyfranc](https://github.com/lewisdonovan/google-news-scraper/issues/42) for the base64 decode fix 🙏
 
@@ -118,7 +118,7 @@ The format of the timeframe is a string comprised of a number, followed by a let
 Defaults to `7d`.
 
 #### getArticleContent
-By default, the scraper does not return the article content, as this would require Puppeteer to navigate to each individual article in the results (increasing execution time significantly). If you would like to enable this behaviour, and receive the content of each article, simply pass `getArticleContent: true,` in the config. This will add two fields to each article in the output: `content` and `favicon`.
+By default, the scraper does not return the article content, as this would require [Puppeteer](https://pptr.dev/) to navigate to each individual article in the results (increasing execution time significantly). If you would like to enable this behaviour, and receive the content of each article, simply pass `getArticleContent: true,` in the config. This will add two fields to each article in the output: `content` and `favicon`.
 
 ```json
 [
@@ -132,6 +132,11 @@ By default, the scraper does not return the article content, as this would requi
         "favicon": "https://url-to-website.com/path/to/favicon.png",
     }
 ]
+```
+
+This is the only feature that needs a headless browser. Puppeteer is an optional dependency since v3, so install it yourself to use this feature:
+```bash
+npm install puppeteer
 ```
 
 ***PLEASE NOTE:*** Due to the large amount of variable factors to take into account, this feature fails on many websites. All errors are handled gracefully and wil return an empty string as the content. Please ensure you handle such outcomes in your application.
@@ -164,17 +169,17 @@ const articles = await googleNewsScraper({
 Defaults to `null`
 
 #### puppeteerArgs
-An array of Chromium flags to pass to the browser instance. By default, this will be an empty array. A full list of available flags can be found [here](https://peter.sh/experiments/chromium-command-line-switches/). NB: if you are launching this in a Heroku app, you will need to pass the `--no-sandbox` and `--disable-setuid-sandbox` flags, as explained in [this SO answer](https://stackoverflow.com/a/52228855/7546845).
+Only used with `getArticleContent`. An array of Chromium flags to pass to the browser instance. By default, this will be an empty array. A full list of available flags can be found [here](https://peter.sh/experiments/chromium-command-line-switches/). NB: if you are launching this in a Heroku app, you will need to pass the `--no-sandbox` and `--disable-setuid-sandbox` flags, as explained in [this SO answer](https://stackoverflow.com/a/52228855/7546845).
 
 Defaults to `[]`
 
 #### puppeteerHeadlessMode
-Whether or not Puppeteer should run in [headless mode](https://www.browserstack.com/guide/puppeteer-headless). Running in headless mode increases performance by approximately 30% (credit to [ole-ve](https://github.com/lewisdonovan/google-news-scraper/pull/45) for finding this). If you're not sure about this setting, leave it as it is.
+Only used with `getArticleContent`. Whether or not Puppeteer should run in [headless mode](https://www.browserstack.com/guide/puppeteer-headless). Running in headless mode increases performance by approximately 30% (credit to [ole-ve](https://github.com/lewisdonovan/google-news-scraper/pull/45) for finding this). If you're not sure about this setting, leave it as it is.
 
 Defaults to `true`
 
 #### limit
-The total number of articles that you would like to be returned. Please note that with higher numbers, the actual returned number may be lower. Typically the max is `99`, but it varies depending on many variables in Puppeteer (such as rate limiting, network conditions etc.). 
+The total number of articles that you would like to be returned. Google News feeds return at most 100 articles.
 
 Defaults to `99` 
 
@@ -193,14 +198,20 @@ const articles = await googleNewsScraper({ searchTerm: "The Oscars" });
 ```
 
 ## Performance 📈
-My test query returned 94 results, which took 4.5 seconds with article content and 3.6 seconds without it. I'm on a fibre connection, and other queries may return a different number of results, so your mileage may vary. 
+Since v3 the scraper reads Google News feeds directly instead of driving a browser, so a search without `prettyURLs` is a single HTTP request. Resolving publisher URLs adds a couple of small requests per article. It's light enough to run on serverless platforms such as Vercel and AWS Lambda.
+
+## Upgrading from v2 ⬆️
+v3 swaps the headless browser for Google News RSS feeds, after Google's markup changes broke the v2 scraper.
+
+* Puppeteer is no longer installed automatically. You only need it for `getArticleContent`, so run `npm install puppeteer` if you use that.
+* `image` is always an empty string, and `articleType` is always `"regular"`.
+* `time` is now a relative time such as `"2 hours ago"`, and articles have a new `sourceUrl` field.
+* Node 18 or later is required.
 
 ## Upkeep 🧹
-Please note that this is a web-scraper, which relies on DOM selectors, so any fundamental changes in the markup on the Google News site will probably break this tool. I'll try my best to keep it up-to-date, but changes to the markup on Google News will be silent and therefore difficult to keep track of. Feel free to submit an issue if the tool stops working.
+A [live smoke test](.github/workflows/smoke.yml) runs against Google News every day, so breakages are spotted quickly. Feel free to submit an issue if the tool stops working.
 
 ## Bugs 🐞
-Due to the size of Chromium, this package is too large to run on Vercel free tier. For more information please refer to [this issue](https://github.com/lewisdonovan/google-news-scraper/issues/41).
-
 Please report bugs via the [issue tracker](https://github.com/lewisdonovan/google-news-scraper/issues).
 
 ## Contribute 🤝
