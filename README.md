@@ -1,14 +1,32 @@
 # 📰 Google News Scraper
 
-A lightweight package that scrapes article data from [Google News](https://news.google.com). Simply pass a keyword or phrase, and the results are returned as an array of JSON objects.
+[![npm version](https://img.shields.io/npm/v/google-news-scraper.svg)](https://www.npmjs.com/package/google-news-scraper)
+[![npm downloads](https://img.shields.io/npm/dm/google-news-scraper.svg)](https://www.npmjs.com/package/google-news-scraper)
+[![Live smoke test](https://github.com/lewisdonovan/google-news-scraper/actions/workflows/smoke.yml/badge.svg)](https://github.com/lewisdonovan/google-news-scraper/actions/workflows/smoke.yml)
+
+Get [Google News](https://news.google.com) results as JSON in one line of Node.js. Search any keyword, topic or the top stories, and get back titles, publisher links, sources and publish dates.
+
+```javascript
+import googleNewsScraper from 'google-news-scraper';
+
+const articles = await googleNewsScraper({ searchTerm: "OpenAI", timeframe: "1d" });
+// [{ title: "...", link: "https://www.reuters.com/...", source: "Reuters", datetime: "2026-10-14T09:12:00.000Z", time: "3 hours ago", ... }]
+```
+
+* ⚡ **No headless browser.** Results come straight from Google News feeds, so a search is a single HTTP request and runs happily on serverless platforms such as Vercel and AWS Lambda.
+* 🔗 **Real publisher URLs.** Google's redirect links are resolved to the original article on the publisher's site.
+* 🌍 **Any language or region.** Pass Google's `hl`/`gl`/`ceid` parameters to search local editions.
+* 🧠 **Optional full text.** Turn on `getArticleContent` to pull each article's body text, ready for summarisation or LLM pipelines.
+* 🟦 **TypeScript types included**, and works with both ESM `import` and CommonJS `require`.
+* ✅ **Checked daily** against the live site, so breakages are caught before you notice them.
+
+Good for news monitoring, brand and competitor tracking, market research, trading signals, newsletters and feeding fresh context to AI agents.
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://donate.stripe.com/6oE7ue8n57wk4PS7ss)
 
-<!-- ![Google News Scraper](https://repository-images.githubusercontent.com/236499568/08f79682-be8e-4625-b84d-7d6ad86bd2d8) -->
-
 ---
 
-## SerpApi - The News Monitoring API (sponsored)
+## Sponsors 💛
 
 <p align="">
   <a href="https://serpapi.com/use-cases/news-monitoring?utm_source=lewisdonovan" target="_blank" rel="noopener nofollow">
@@ -18,15 +36,14 @@ A lightweight package that scrapes article data from [Google News](https://news.
 
 [SerpApi - The News Monitoring API](https://serpapi.com/use-cases/news-monitoring?utm_source=lewisdonovan). We help you access real-time search engine data via a simple API, which includes news from Google, Bing, and DuckDuckGo. 
 
+**Want your product in front of developers building with news data?** Sponsorship puts your logo here and on the npm page. Sponsor via [GitHub Sponsors](https://github.com/sponsors/lewisdonovan), or [get in touch](https://github.com/lewisdonovan) to talk about placements.
+
 ---
-
-
 
 * [Installation](#installation-)
 * [Usage](#usage-%EF%B8%8F)
 * [Output](#output-)
 * [Config](#config-%EF%B8%8F)
-
 * [TypeScript](#typescript-)
 * [CommonJS](#common-js-)
 * [Performance](#performance-)
@@ -51,7 +68,15 @@ yarn add google-news-scraper
 Simply import the package and pass a config object.
 ```javascript
 import googleNewsScraper from 'google-news-scraper';
+
+// Search
 const articles = await googleNewsScraper({ searchTerm: "The Oscars" });
+
+// Top stories in the UK edition
+const topStories = await googleNewsScraper({ queryVars: { hl: "en-GB", gl: "GB" } });
+
+// A topic page
+const tech = await googleNewsScraper({ baseUrl: "https://news.google.com/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGRqTVhZU0FtVnVHZ0pWVXlnQVAB" });
 ```
 A minimum working example can be found in [this repo](https://github.com/lewisdonovan/gns-example). 
 Full documentation on the [config object](#config) can be found below.
