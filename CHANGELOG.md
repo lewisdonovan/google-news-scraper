@@ -1,3 +1,21 @@
+# [3.0.0](https://github.com/lewisdonovan/google-news-scraper/compare/v2.7.1...v3.0.0) (2026-10-14)
+
+
+* feat!: read Google News RSS feeds instead of scraping the page ([b890303](https://github.com/lewisdonovan/google-news-scraper/commit/b89030388d413628211ae8f7e2c55f02063c4bf5)), closes [#71](https://github.com/lewisdonovan/google-news-scraper/issues/71) [#63](https://github.com/lewisdonovan/google-news-scraper/issues/63) [#71](https://github.com/lewisdonovan/google-news-scraper/issues/71) [#63](https://github.com/lewisdonovan/google-news-scraper/issues/63)
+
+
+### Bug Fixes
+
+* close browser page in getArticleContent to prevent memory leak ([22293b9](https://github.com/lewisdonovan/google-news-scraper/commit/22293b9f7a78c3c5c78bdc6a83bd6d9b3b6add40))
+* let TypeScript resolve types and default import from CommonJS ([cd6d00c](https://github.com/lewisdonovan/google-news-scraper/commit/cd6d00c884fde37757a1be048416549b31681297)), closes [#62](https://github.com/lewisdonovan/google-news-scraper/issues/62)
+* nullish coalescing for readability 0.6.0 type safety ([8be7865](https://github.com/lewisdonovan/google-news-scraper/commit/8be78652274ad292e60433317bb8d10977e368e8))
+
+
+### BREAKING CHANGES
+
+* puppeteer must be installed separately to use
+getArticleContent; image is always empty, articleType is always
+"regular", time is a relative string, and Node 18+ is required.
 
 # google-news-scraper CHANGELOG
 All notable changes to this project will be documented in this file.
