@@ -10,7 +10,8 @@
       "types": "./dist/tsc/index.d.ts",
       "import": "./dist/esm/index.mjs",
       "require": "./dist/cjs/index.js"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist/cjs",
@@ -54,7 +55,6 @@
   "license": "MIT",
   "dependencies": {
     "@mozilla/readability": "^0.6.0",
-    "@rollup/plugin-babel": "^6.0.4",
     "cheerio": "^1.2.0",
     "jsdom": "^29.1.1",
     "winston": "^3.15.0"
