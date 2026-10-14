@@ -125,6 +125,38 @@ const parseFeed = (xml, now = new Date()) => {
     }).get();
 };
 
+var __awaiter$4 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+const RETRYABLE_STATUSES = [429, 500, 502, 503, 504];
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+// Google intermittently answers with 503/429 when an IP sends a burst of requests,
+// so transient failures are retried with exponential backoff before giving up
+const fetchWithRetry = (url_1, ...args_1) => __awaiter$4(void 0, [url_1, ...args_1], void 0, function* (url, init = {}, { attempts = 3, baseDelayMs = 1000, timeoutMs = 30000 } = {}) {
+    var _a, _b;
+    for (let attempt = 1;; attempt++) {
+        const isLast = attempt >= attempts;
+        try {
+            const response = yield fetch(url, Object.assign(Object.assign({}, init), { signal: AbortSignal.timeout(timeoutMs) }));
+            if (isLast || !RETRYABLE_STATUSES.includes(response.status))
+                return response;
+            const retryAfter = Number((_b = (_a = response.headers) === null || _a === void 0 ? void 0 : _a.get) === null || _b === void 0 ? void 0 : _b.call(_a, 'retry-after'));
+            yield sleep(retryAfter > 0 ? Math.min(retryAfter * 1000, 10000) : baseDelayMs * Math.pow(2, (attempt - 1)));
+        }
+        catch (error) {
+            if (isLast)
+                throw error;
+            yield sleep(baseDelayMs * Math.pow(2, (attempt - 1)));
+        }
+    }
+});
+
 var __awaiter$3 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -152,10 +184,9 @@ const decodeLegacyId = (id) => {
 // which needs a signature and timestamp scraped from the article's redirect page
 const decodeWithGoogle = (id) => __awaiter$3(void 0, void 0, void 0, function* () {
     var _a, _b;
-    const page = yield fetch(`https://news.google.com/rss/articles/${id}`, {
+    const page = yield fetchWithRetry(`https://news.google.com/rss/articles/${id}`, {
         headers: { 'User-Agent': USER_AGENT$1 },
-        signal: AbortSignal.timeout(TIMEOUT_MS),
-    });
+    }, { attempts: 2, timeoutMs: TIMEOUT_MS });
     const html = yield page.text();
     const signature = (_a = html.match(/data-n-a-sg="([^"]+)"/)) === null || _a === void 0 ? void 0 : _a[1];
     const timestamp = (_b = html.match(/data-n-a-ts="([^"]+)"/)) === null || _b === void 0 ? void 0 : _b[1];
@@ -166,12 +197,11 @@ const decodeWithGoogle = (id) => __awaiter$3(void 0, void 0, void 0, function* (
         [['X', 'X', ['X', 'X'], null, null, 1, 1, 'US:en', null, 1, null, null, null, null, null, 0, 1], 'X', 'X', 1, [1, 1, 1], 1, 1, null, 0, 0, null, 0],
         id, Number(timestamp), signature,
     ]);
-    const response = yield fetch('https://news.google.com/_/DotsSplashUi/data/batchexecute', {
+    const response = yield fetchWithRetry('https://news.google.com/_/DotsSplashUi/data/batchexecute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'User-Agent': USER_AGENT$1 },
         body: 'f.req=' + encodeURIComponent(JSON.stringify([[['Fbv4je', payload, null, 'generic']]])),
-        signal: AbortSignal.timeout(TIMEOUT_MS),
-    });
+    }, { attempts: 2, timeoutMs: TIMEOUT_MS });
     const text = yield response.text();
     const json = JSON.parse(text.slice(text.indexOf('[')));
     const result = JSON.parse(json[0][2]);
@@ -3308,9 +3338,8 @@ const googleNewsScraper = (userConfig) => __awaiter(void 0, void 0, void 0, func
     logger.info(`📰 SCRAPING NEWS FROM: ${url}`);
     let xml;
     try {
-        const response = yield fetch(url, {
+        const response = yield fetchWithRetry(url, {
             headers: { 'User-Agent': USER_AGENT, 'Accept-Language': 'en-US,en;q=0.9' },
-            signal: AbortSignal.timeout(30000),
         });
         if (!response.ok) {
             logger.error(`Google News responded with ${response.status} for ${url}`);

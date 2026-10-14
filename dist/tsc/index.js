@@ -12,6 +12,7 @@ import buildFeedUrl from './buildFeedUrl';
 import parseFeed from './parseFeed';
 import getPrettyUrl from './getPrettyUrl';
 import mapLimit from './mapLimit';
+import fetchWithRetry from './fetchWithRetry';
 import getArticleContent from './getArticleContent';
 const USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36';
 const PRETTY_URL_CONCURRENCY = 5;
@@ -31,9 +32,8 @@ const googleNewsScraper = (userConfig) => __awaiter(void 0, void 0, void 0, func
     logger.info(`📰 SCRAPING NEWS FROM: ${url}`);
     let xml;
     try {
-        const response = yield fetch(url, {
+        const response = yield fetchWithRetry(url, {
             headers: { 'User-Agent': USER_AGENT, 'Accept-Language': 'en-US,en;q=0.9' },
-            signal: AbortSignal.timeout(30000),
         });
         if (!response.ok) {
             logger.error(`Google News responded with ${response.status} for ${url}`);
