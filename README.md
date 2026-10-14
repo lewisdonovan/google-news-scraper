@@ -3,6 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/google-news-scraper.svg)](https://www.npmjs.com/package/google-news-scraper)
 [![npm downloads](https://img.shields.io/npm/dm/google-news-scraper.svg)](https://www.npmjs.com/package/google-news-scraper)
 [![Live smoke test](https://github.com/lewisdonovan/google-news-scraper/actions/workflows/smoke.yml/badge.svg)](https://github.com/lewisdonovan/google-news-scraper/actions/workflows/smoke.yml)
+[![License: MIT](https://img.shields.io/npm/l/google-news-scraper.svg)](LICENSE.txt)
 
 Get [Google News](https://news.google.com) results as JSON in one line of Node.js. Search any keyword, topic or the top stories, and get back titles, publisher links, sources and publish dates.
 
@@ -233,3 +234,6 @@ Feel free to [submit a PR](https://github.com/lewisdonovan/google-news-scraper/p
 
 ## Python version 🐍
 If you're looking for a Python version, there's one [here](https://github.com/morganbarber/python-news-scraper/). Please note, the Python version is a fork and is maintained separately. If you have any issues with the Python version, please open an issue on that repo instead here.
+
+## License 📄
+[MIT](LICENSE.txt)

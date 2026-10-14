@@ -51,7 +51,7 @@
     "ai agents"
   ],
   "author": "Lewis Donovan",
-  "license": "SEE LICENSE IN LICENSE.txt",
+  "license": "MIT",
   "dependencies": {
     "@mozilla/readability": "^0.6.0",
     "@rollup/plugin-babel": "^6.0.4",
