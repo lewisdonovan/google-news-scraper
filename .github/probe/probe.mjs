@@ -22,6 +22,12 @@ for (const url of [
     articleLinks: $('a[href^="./article"]').length, readLinks: $('a[href^="./read"]').length,
     cwiz: $('c-wiz').length, h4: $('h4').length, time: $('time').length });
   $('article').slice(0, 3).each((i, el) => log(`ARTICLE ${i}`, $.html(el).slice(0, 4000)));
+  // New markup: show the smallest ancestor around a few ./read links that also contains a <time>
+  $('a[href^="./read"]').slice(0, 4).each((i, a) => {
+    let el = $(a);
+    for (let d = 0; d < 8 && !el.find('time').length; d++) el = el.parent();
+    log(`READ CONTAINER ${i} <${el.prop('tagName')} class=${el.attr('class')}>`, $.html(el).slice(0, 5000));
+  });
   if (!$('article').length) log('BODY START', $('body').html()?.slice(0, 6000) ?? '');
   // Grab a sample of anchors with hrefs to learn the link structure
   log('HREF SAMPLE', [...new Set($('a[href]').map((_, a) => $(a).attr('href')).get())].slice(0, 40));
@@ -33,7 +39,7 @@ await browser.close();
 const rss = await fetch('https://news.google.com/rss/search?q=tesla+when:7d&hl=en-US&gl=US&ceid=US:en', { headers: { 'User-Agent': UA } });
 const rssText = await rss.text();
 log('RSS', { status: rss.status, length: rssText.length, items: (rssText.match(/<item>/g) || []).length });
-log('RSS SAMPLE', rssText.slice(0, 3000));
+log('RSS SAMPLE', rssText.split('<item>').slice(1, 4).join('\n<item>'));
 
 // Pretty URL: try decoding the first article id via batchexecute
 const id = (rssText.match(/news\.google\.com\/rss\/articles\/([A-Za-z0-9_-]+)/) || [])[1];
