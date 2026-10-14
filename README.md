@@ -7,17 +7,6 @@ A lightweight package that scrapes article data from [Google News](https://news.
 <!-- ![Google News Scraper](https://repository-images.githubusercontent.com/236499568/08f79682-be8e-4625-b84d-7d6ad86bd2d8) -->
 
 ---
-## Enterprise-Grade Google News API (sponsored)
-
-<p align="">
-  <a href="https://hasdata.com/apis/google-news-api" target="_blank" rel="noopener nofollow">
-    <img width="266" height="100" alt="HasData logo" src="https://lewisdonovan.dev/images/projects/hasdata.png" />
-  </a>
-</p>
-
-[HasData's Google News API](https://hasdata.com/apis/google-news-api) returns structured data in 1.75 seconds. No proxies, CAPTCHAs, or headless browsers to maintain. Start with 1,000 free API calls.
-
----
 
 ## SerpApi - The News Monitoring API (sponsored)
 
