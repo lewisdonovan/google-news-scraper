@@ -6,8 +6,11 @@
   "module": "./dist/esm/index.mjs",
   "types": "./dist/tsc/index.d.ts",
   "exports": {
-    "import": "./dist/esm/index.mjs",
-    "require": "./dist/cjs/index.js"
+    ".": {
+      "types": "./dist/tsc/index.d.ts",
+      "import": "./dist/esm/index.mjs",
+      "require": "./dist/cjs/index.js"
+    }
   },
   "files": [
     "dist/cjs",

@@ -3355,3 +3355,4 @@ const googleNewsScraper = (userConfig) => __awaiter(void 0, void 0, void 0, func
 });
 
 module.exports = googleNewsScraper;
+module.exports.default = module.exports;

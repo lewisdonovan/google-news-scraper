@@ -28,6 +28,8 @@ export default {
       format: 'cjs',
       sourcemap: false,
       exports: 'auto',
+      // Lets TypeScript's `import x from` work without esModuleInterop (#62)
+      footer: 'module.exports.default = module.exports;',
       entryFileNames: '[name].js',
     },
     {
@@ -36,6 +38,7 @@ export default {
       plugins: [terser()],
       sourcemap: true,
       exports: 'auto',
+      footer: 'module.exports.default = module.exports;',
       entryFileNames: '[name].min.js',
     },
   ],
