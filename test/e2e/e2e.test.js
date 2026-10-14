@@ -1,50 +1,30 @@
 import expect from 'expect.js'
-import googleNewsScraper from '../../index.js'
+import gnsModule from '../../dist/tsc/index.js'
+const googleNewsScraper = gnsModule.default ?? gnsModule
 
-// E2E tests require actual network access and browser.
-// Skip by default. Run with E2E=1 npm test -- --testPathPattern="e2e"
+// Hits the real Google News, so it only runs when asked: E2E=1 npx jest test/e2e
+const describeLive = process.env.E2E ? describe : describe.skip
 
-describe('googleNewsScraper - e2e', () => {
-  it('should scrape front page without searchTerm', async () => {
-    const articles = await googleNewsScraper({
-      prettyURLs: false,
-      timeframe: '1d',
-      limit: 3,
-      logLevel: 'none',
-    })
+describeLive('googleNewsScraper - e2e', () => {
+  jest.setTimeout(60000)
 
-    expect(articles).to.be.an('array')
-    expect(articles.length).to.be.greaterThanOrEqual(1)
-    expect(articles[0]).to.haveProperty('title')
-    expect(articles[0]).to.haveProperty('link')
+  it('scrapes top stories without a searchTerm', async () => {
+    const articles = await googleNewsScraper({ prettyURLs: false, limit: 3, logLevel: 'error' })
+    expect(articles.length).to.be.greaterThan(0)
     expect(articles[0].title).to.not.be.empty()
+    expect(articles[0].link).to.contain('news.google.com')
   })
 
-  it('should scrape results for a search term', async () => {
-    const articles = await googleNewsScraper({
-      searchTerm: 'technology',
-      prettyURLs: false,
-      timeframe: '7d',
-      limit: 3,
-      logLevel: 'none',
-    })
-
-    expect(articles).to.be.an('array')
-    expect(articles.length).to.be.greaterThanOrEqual(1)
-    expect(articles[0]).to.haveProperty('articleType')
-    expect(['regular', 'topicFeatured', 'topicSmall', '']).to.contain(articles[0].articleType)
-  })
-
-  it('should return articles with valid ISO datetime', async () => {
-    const articles = await googleNewsScraper({
-      searchTerm: 'news',
-      prettyURLs: false,
-      timeframe: '1d',
-      limit: 3,
-      logLevel: 'none',
-    })
-
-    expect(articles.length).to.be.greaterThanOrEqual(1)
+  it('scrapes results for a search term', async () => {
+    const articles = await googleNewsScraper({ searchTerm: 'technology', prettyURLs: false, limit: 3, logLevel: 'error' })
+    expect(articles.length).to.be.greaterThan(0)
+    expect(articles[0].source).to.not.be.empty()
     expect(new Date(articles[0].datetime).getTime()).to.be.greaterThan(0)
+  })
+
+  it('resolves publisher urls', async () => {
+    const articles = await googleNewsScraper({ searchTerm: 'news', limit: 2, logLevel: 'error' })
+    expect(articles.length).to.be.greaterThan(0)
+    expect(articles.some(article => !article.link.includes('news.google.com'))).to.be(true)
   })
 })

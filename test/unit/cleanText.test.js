@@ -1,5 +1,5 @@
 import expect from 'expect.js'
-import { cleanText } from '../../cleanText.js'
+import { cleanText } from '../../dist/tsc/cleanText.js'
 
 describe('cleanText', () => {
   it('returns empty string for empty input', () => {

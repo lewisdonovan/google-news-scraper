@@ -1,4 +1,4 @@
-import { Browser } from 'puppeteer';
+import type { Browser } from 'puppeteer';
 import winston from "winston";
 
 type Timeframe = `${number}${'h' | 'd' | 'm' | 'y'}`;
@@ -43,6 +43,7 @@ export type Article = {
   articleType: string;
   content?: string;
   favicon?: string;
+  sourceUrl?: string;
 };
 
 export type Articles = Article[];
@@ -61,6 +62,3 @@ export interface ExtractArticleContentAndFaviconProps {
   logger: winston.Logger;
 }
 
-// declare const googleNewsScraper: (userConfig: GNSUserConfig) => Promise<Article[]>;
-
-// export default googleNewsScraper;

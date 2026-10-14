@@ -1,8 +1,7 @@
 'use strict';
 
-var puppeteer = require('puppeteer');
-var cheerio = require('cheerio');
 var winston = require('winston');
+var cheerio = require('cheerio');
 var jsdom = require('jsdom');
 
 function _interopNamespaceDefault(e) {
@@ -50,77 +49,170 @@ const getLogger = (level) => (winston.createLogger({
     level
 }));
 
-const getTitle = (article, articleType) => {
+const RSS_ROOT = 'https://news.google.com/rss';
+// Google News serves every page as an RSS feed under /rss, e.g.
+// /topics/ABC -> /rss/topics/ABC and /search?q=x -> /rss/search?q=x
+const toFeedUrl = (baseUrl) => {
+    const url = new URL(baseUrl);
+    if (url.hostname === 'news.google.com' && !url.pathname.startsWith('/rss')) {
+        url.pathname = `/rss${url.pathname === '/' ? '' : url.pathname}`;
+    }
+    return url;
+};
+const buildFeedUrl = (config) => {
     var _a, _b;
-    try {
-        switch (articleType) {
-            case "regular":
-                return (article.find('h4').text() || article.find('div > div + div > div a').text() || "").trim() || "";
-            case "topicFeatured":
-                return (article.find('a[target=_blank]').text() || ((_a = article.find('button').attr('aria-label')) === null || _a === void 0 ? void 0 : _a.replace('More - ', '')) || "").trim() || "";
-            case "topicSmall":
-                return (article.find('a[target=_blank]').text() || ((_b = article.find('button').attr('aria-label')) === null || _b === void 0 ? void 0 : _b.replace('More - ', '')) || "").trim() || "";
-            default:
-                return "";
-        }
+    let url;
+    if (config.searchTerm) {
+        url = new URL(`${RSS_ROOT}/search`);
+        const when = config.timeframe ? ` when:${config.timeframe}` : '';
+        url.searchParams.set('q', `${config.searchTerm}${when}`);
     }
-    catch (err) {
-        return "";
+    else {
+        url = config.baseUrl ? toFeedUrl(config.baseUrl) : new URL(RSS_ROOT);
     }
+    for (const [key, value] of Object.entries((_a = config.queryVars) !== null && _a !== void 0 ? _a : {})) {
+        url.searchParams.set(key, value);
+    }
+    // Without a locale Google picks one from the caller's IP, which makes results unpredictable
+    if (!url.searchParams.has('hl'))
+        url.searchParams.set('hl', 'en-US');
+    if (!url.searchParams.has('gl'))
+        url.searchParams.set('gl', 'US');
+    if (!url.searchParams.has('ceid')) {
+        const gl = url.searchParams.get('gl');
+        const lang = ((_b = url.searchParams.get('hl')) !== null && _b !== void 0 ? _b : 'en').split('-')[0];
+        url.searchParams.set('ceid', `${gl}:${lang}`);
+    }
+    return url.toString();
 };
 
-const getArticleType = (article) => {
-    if (article.find('h4').text() ||
-        article.find('div > div + div > div a').text())
-        return "regular";
-    if (article.find('figure').length) {
-        return "topicFeatured";
+const units = [
+    ['year', 31536000], ['month', 2592000], ['week', 604800],
+    ['day', 86400], ['hour', 3600], ['minute', 60],
+];
+const timeAgo = (date, now = new Date()) => {
+    const seconds = Math.round((now.getTime() - date.getTime()) / 1000);
+    const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+    for (const [unit, size] of units) {
+        if (Math.abs(seconds) >= size)
+            return rtf.format(-Math.floor(seconds / size), unit);
     }
-    if (article.find('> a').text())
-        return "topicSmall";
-    return "";
+    return rtf.format(-seconds, 'second');
+};
+const parseFeed = (xml, now = new Date()) => {
+    const $ = cheerio__namespace.load(xml, { xml: true });
+    return $('item').map((_, item) => {
+        var _a;
+        const $item = $(item);
+        const source = $item.find('source').text().trim();
+        const rawTitle = $item.find('title').text().trim();
+        // Feed titles end with " - Source"; the source has its own field
+        const title = source && rawTitle.endsWith(` - ${source}`)
+            ? rawTitle.slice(0, -(source.length + 3))
+            : rawTitle;
+        const published = new Date($item.find('pubDate').text());
+        const valid = !isNaN(published.getTime());
+        return {
+            title,
+            link: $item.find('link').text().trim(),
+            image: '',
+            source,
+            sourceUrl: (_a = $item.find('source').attr('url')) !== null && _a !== void 0 ? _a : '',
+            datetime: valid ? published.toISOString() : '',
+            time: valid ? timeAgo(published, now) : '',
+            articleType: 'regular',
+        };
+    }).get();
 };
 
-const getPrettyUrl = (uglyUrl, logger) => {
-    const base64Match = uglyUrl.match(/\/read\/([A-Za-z0-9-_]+)/);
-    if (!base64Match) {
+var __awaiter$3 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+const USER_AGENT$1 = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36';
+const TIMEOUT_MS = 15000;
+const getArticleId = (googleUrl) => {
+    const match = googleUrl.match(/\/(?:rss\/)?(?:articles|read)\/([A-Za-z0-9_-]+)/);
+    return match ? match[1] : null;
+};
+// Older article ids embed the publisher URL directly in their base64 payload
+const decodeLegacyId = (id) => {
+    const decoded = Buffer.from(id, 'base64').toString('latin1');
+    if (decoded.includes('AU_yqL'))
         return null;
-    }
-    const base64String = base64Match[1];
+    const match = decoded.match(/https?:\/\/[\x21-\x7e]+/);
+    return match ? match[0] : null;
+};
+// Newer ids are opaque: Google resolves them through its own batchexecute endpoint,
+// which needs a signature and timestamp scraped from the article's redirect page
+const decodeWithGoogle = (id) => __awaiter$3(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    const page = yield fetch(`https://news.google.com/rss/articles/${id}`, {
+        headers: { 'User-Agent': USER_AGENT$1 },
+        signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
+    const html = yield page.text();
+    const signature = (_a = html.match(/data-n-a-sg="([^"]+)"/)) === null || _a === void 0 ? void 0 : _a[1];
+    const timestamp = (_b = html.match(/data-n-a-ts="([^"]+)"/)) === null || _b === void 0 ? void 0 : _b[1];
+    if (!signature || !timestamp)
+        return null;
+    const payload = JSON.stringify([
+        'garturlreq',
+        [['X', 'X', ['X', 'X'], null, null, 1, 1, 'US:en', null, 1, null, null, null, null, null, 0, 1], 'X', 'X', 1, [1, 1, 1], 1, 1, null, 0, 0, null, 0],
+        id, Number(timestamp), signature,
+    ]);
+    const response = yield fetch('https://news.google.com/_/DotsSplashUi/data/batchexecute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'User-Agent': USER_AGENT$1 },
+        body: 'f.req=' + encodeURIComponent(JSON.stringify([[['Fbv4je', payload, null, 'generic']]])),
+        signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
+    const text = yield response.text();
+    const json = JSON.parse(text.slice(text.indexOf('[')));
+    const result = JSON.parse(json[0][2]);
+    return typeof (result === null || result === void 0 ? void 0 : result[1]) === 'string' ? result[1] : null;
+});
+const getPrettyUrl = (googleUrl, logger) => __awaiter$3(void 0, void 0, void 0, function* () {
+    var _a;
+    const id = getArticleId(googleUrl);
+    if (!id)
+        return null;
     try {
-        const decodedString = Buffer.from(base64String, "base64").toString("ascii");
-        const urlPattern = /https?:\/\/[^\s"']+/g;
-        const matches = decodedString.match(urlPattern) || [];
-        const urls = matches.flatMap(match => {
-            const splitUrls = match.split(/(?<!http:|https:)R(?![a-zA-Z0-9-_])|(?<!http:|https:)y(?![a-zA-Z0-9-_])/);
-            return splitUrls.filter(url => {
-                const cleanUrl = url.trim().replace(/[^\w\-\/:.]+$/, '').replace(/\\x[0-9A-Fa-f]{2}/g, '');
-                return cleanUrl;
-            });
-        });
-        const uniqueUrls = [...new Set(urls)];
-        const finalUrl = uniqueUrls.length ? uniqueUrls[0] : uglyUrl;
-        logger.info(finalUrl);
-        return finalUrl;
+        return (_a = decodeLegacyId(id)) !== null && _a !== void 0 ? _a : yield decodeWithGoogle(id);
     }
     catch (error) {
-        logger.error(error);
+        logger.warn(`Could not resolve publisher URL for ${googleUrl}: ${error}`);
         return null;
     }
-};
+});
 
-const buildQueryString = (query) => {
-    // Bail if there's nothing in the Object
-    if (!query || Object.keys(query).length === 0)
-        return "";
-    // Build query string
-    // Example: { q: 'zapatos', gl: 'ES', ceid: "es:es" } => '?q=zapatos&gl=ES&ceid=ES:es'
-    const queryString = Object.keys(query).reduce((acc, key, index) => {
-        const prefix = index === 0 ? '?' : '&';
-        return `${acc}${prefix}${key}=${query[key]}`;
-    }, '');
-    return queryString;
+var __awaiter$2 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
 };
+// Like Promise.all over items.map(fn), but with at most `limit` calls in flight
+const mapLimit = (items, limit, fn) => __awaiter$2(void 0, void 0, void 0, function* () {
+    const results = new Array(items.length);
+    let next = 0;
+    const worker = () => __awaiter$2(void 0, void 0, void 0, function* () {
+        while (next < items.length) {
+            const index = next++;
+            results[index] = yield fn(items[index]);
+        }
+    });
+    yield Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+    return results;
+});
 
 var Readability = {exports: {}};
 
@@ -3198,8 +3290,9 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+const USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36';
+const PRETTY_URL_CONCURRENCY = 5;
 const googleNewsScraper = (userConfig) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
     const config = Object.assign({
         prettyURLs: true,
         getArticleContent: false,
@@ -3211,96 +3304,55 @@ const googleNewsScraper = (userConfig) => __awaiter(void 0, void 0, void 0, func
         limit: 99
     }, userConfig);
     const logger = getLogger(config.logLevel);
-    const queryVars = config.queryVars
-        ? Object.assign(Object.assign({}, config.queryVars), { when: config.timeframe }) : { when: config.timeframe };
-    if (userConfig.searchTerm) {
-        queryVars.q = userConfig.searchTerm;
-    }
-    const queryString = (_a = buildQueryString(queryVars)) !== null && _a !== void 0 ? _a : '';
-    const baseUrl = (_b = config.baseUrl) !== null && _b !== void 0 ? _b : `https://news.google.com/search`;
-    const url = `${baseUrl}${queryString}`;
+    const url = buildFeedUrl(config);
     logger.info(`📰 SCRAPING NEWS FROM: ${url}`);
-    const requiredArgs = [
-        '--disable-extensions-except=/path/to/manifest/folder/',
-        '--load-extension=/path/to/manifest/folder/',
-    ];
-    const puppeteerConfig = {
-        headless: userConfig.puppeteerHeadlessMode,
-        args: puppeteer.defaultArgs().concat(config.puppeteerArgs).filter(Boolean).concat(requiredArgs)
-    };
-    const browser = yield puppeteer.launch(puppeteerConfig);
-    const page = yield browser.newPage();
-    page.setViewport({ width: 1366, height: 768 });
-    page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36');
-    page.setRequestInterception(true);
-    page.on('request', request => {
-        if (!request.isNavigationRequest()) {
-            request.continue();
-            return;
-        }
-        const headers = request.headers();
-        headers['Accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3';
-        headers['Accept-Encoding'] = 'gzip';
-        headers['Accept-Language'] = 'en-US,en;q=0.9,es;q=0.8';
-        headers['Upgrade-Insecure-Requests'] = "1";
-        headers['Referer'] = 'https://www.google.com/';
-        request.continue({ headers });
-    });
-    yield page.setCookie({
-        name: "CONSENT",
-        value: `YES+cb.${new Date().toISOString().split('T')[0].replace(/-/g, '')}-04-p0.en-GB+FX+667`,
-        domain: ".google.com"
-    });
-    yield page.goto(url, { waitUntil: 'networkidle2' });
+    let xml;
     try {
-        yield page.$(`[aria-label="Reject all"]`);
-        yield Promise.all([
-            page.click(`[aria-label="Reject all"]`),
-            page.waitForNavigation({ waitUntil: 'networkidle2' })
-        ]);
+        const response = yield fetch(url, {
+            headers: { 'User-Agent': USER_AGENT, 'Accept-Language': 'en-US,en;q=0.9' },
+            signal: AbortSignal.timeout(30000),
+        });
+        if (!response.ok) {
+            logger.error(`Google News responded with ${response.status} for ${url}`);
+            return [];
+        }
+        xml = yield response.text();
     }
-    catch (err) { }
-    const content = yield page.content();
-    const $ = cheerio__namespace.load(content);
-    const articles = $('article');
-    let results = [];
-    $(articles).each(function () {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
-        const link = ((_c = (_b = (_a = $(this)) === null || _a === void 0 ? void 0 : _a.find('a[href^="./article"]')) === null || _b === void 0 ? void 0 : _b.attr('href')) === null || _c === void 0 ? void 0 : _c.replace('./', 'https://news.google.com/')) || ((_f = (_e = (_d = $(this)) === null || _d === void 0 ? void 0 : _d.find('a[href^="./read"]')) === null || _e === void 0 ? void 0 : _e.attr('href')) === null || _f === void 0 ? void 0 : _f.replace('./', 'https://news.google.com/')) || "";
-        const srcset = (_g = $(this).find('figure').find('img').attr('srcset')) === null || _g === void 0 ? void 0 : _g.split(' ');
-        const image = srcset && srcset.length
-            ? srcset[srcset.length - 2]
-            : $(this).find('figure').find('img').attr('src');
-        const articleType = getArticleType($(this));
-        const title = getTitle($(this), articleType);
-        const mainArticle = {
-            title,
-            "link": link,
-            "image": (image === null || image === void 0 ? void 0 : image.startsWith("/")) ? `https://news.google.com${image}` : image || "",
-            "source": $(this).find('div[data-n-tid]').text() || "",
-            "datetime": ((_j = new Date(((_h = $(this).find('div:last-child time')) === null || _h === void 0 ? void 0 : _h.attr('datetime')) || "")) === null || _j === void 0 ? void 0 : _j.toISOString()) || "",
-            "time": $(this).find('div:last-child time').text() || "",
-            articleType
-        };
-        results.push(mainArticle);
-    });
+    catch (error) {
+        logger.error(`Failed to fetch ${url}: ${error}`);
+        return [];
+    }
+    let results = parseFeed(xml)
+        .filter(article => article.title)
+        .slice(0, Math.max(0, config.limit));
     if (config.prettyURLs) {
-        results = yield Promise.all(results.map(article => {
-            const url = getPrettyUrl(article.link, logger);
-            if (url) {
-                article.link = url;
-            }
-            return article;
+        results = yield mapLimit(results, PRETTY_URL_CONCURRENCY, (article) => __awaiter(void 0, void 0, void 0, function* () {
+            const prettyUrl = yield getPrettyUrl(article.link, logger);
+            return prettyUrl ? Object.assign(Object.assign({}, article), { link: prettyUrl }) : article;
         }));
     }
-    if (config.getArticleContent) {
-        const filterWords = config.filterWords || [];
-        results = yield getArticleContent({ articles: results, browser, filterWords, logger });
+    if (config.getArticleContent && results.length) {
+        let puppeteer;
+        try {
+            puppeteer = (yield import('puppeteer')).default;
+        }
+        catch (_a) {
+            throw new Error("getArticleContent requires puppeteer. Install it with `npm install puppeteer`.");
+        }
+        const browser = yield puppeteer.launch({
+            headless: config.puppeteerHeadlessMode,
+            args: config.puppeteerArgs,
+        });
+        try {
+            const filterWords = config.filterWords || [];
+            results = yield getArticleContent({ articles: results, browser, filterWords, logger });
+        }
+        finally {
+            yield browser.close();
+        }
     }
-    yield page.close();
-    yield browser.close();
-    const filtered = results.filter(result => result.title);
-    return config.limit < results.length ? filtered.slice(0, config.limit) : filtered;
+    return results;
 });
 
 module.exports = googleNewsScraper;
+module.exports.default = module.exports;
