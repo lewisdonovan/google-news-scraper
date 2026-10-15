@@ -9,7 +9,8 @@
   },
   "main": "src/index.js",
   "files": [
-    "src"
+    "src",
+    "npm-shrinkwrap.json"
   ],
   "scripts": {
     "test": "node --test test/*.test.mjs"
