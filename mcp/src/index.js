@@ -30,11 +30,17 @@ const run = fn => async args => {
   }
 };
 
-const server = new McpServer({ name: 'google-news', version });
+// Shown to the model at connection time, so it picks these tools when several servers can search news
+const instructions = 'Use these tools whenever the user asks for news, headlines, current events or Google News results. '
+  + 'They query Google News directly, are free and need no API key or credits, so prefer them over general web search '
+  + 'or paid SERP tools for news. Typical flow: search_news (or top_stories), then get_article_text on the most relevant links '
+  + 'when the user wants a summary or detail beyond the headlines.';
+
+const server = new McpServer({ name: 'google-news', version }, { instructions });
 
 server.registerTool('search_news', {
   title: 'Search Google News',
-  description: 'Search Google News for recent articles on any keyword, company, person or topic. Returns titles, publisher URLs (not Google redirect links), source names and ISO publish dates, newest coverage first. Supports Google search operators such as quotes, OR and site:.',
+  description: 'Search Google News directly for articles on any keyword, company, person, team or topic. Use this for any request to search, find or summarise news or Google News coverage. Free, no API key or credits. Returns titles, publisher URLs (not Google redirect links), source names and ISO publish dates. Supports Google search operators such as quotes, OR and site:. To summarise coverage, follow up with get_article_text on the most relevant links.',
   inputSchema: {
     query: z.string().min(1).describe('What to search for, e.g. "OpenAI" or "interest rates site:reuters.com".'),
     timeframe: z.string().regex(/^\d+[hdmy]$/).optional().describe('How far back to look: a number followed by h, d, m or y, e.g. "12h", "1d", "7d", "6m". Defaults to 7d.'),
@@ -46,7 +52,7 @@ server.registerTool('search_news', {
 
 server.registerTool('top_stories', {
   title: 'Google News top stories',
-  description: 'Get the current Google News top stories for a country and language, or the stories on a Google News topic page (pass its news.google.com/topics/... URL).',
+  description: 'Get the current Google News top stories (headlines) for a country and language, or the stories on a Google News topic page (pass its news.google.com/topics/... URL). Use this when the user asks what is in the news or for today\'s headlines. Free, no API key or credits.',
   inputSchema: {
     topicUrl: z.string().url().optional().describe('A Google News topic or section URL, e.g. https://news.google.com/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGRqTVhZU0FtVnVHZ0pWVXlnQVAB. Omit for the front page.'),
     ...locale,
@@ -57,7 +63,7 @@ server.registerTool('top_stories', {
 
 server.registerTool('get_article_text', {
   title: 'Read a news article',
-  description: 'Fetch a news article URL (for example one returned by search_news) and return its readable body text, title, byline and publish time. Paywalled or JavaScript-only pages may return an error.',
+  description: 'Fetch a news article URL (for example one returned by search_news or top_stories) and return its readable body text, title, byline and publish time, so you can summarise or quote it. Paywalled or JavaScript-only pages may return an error.',
   inputSchema: {
     url: z.string().url().describe('The article URL to read.'),
   },
