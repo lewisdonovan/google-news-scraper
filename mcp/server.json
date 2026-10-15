@@ -1,0 +1,20 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+  "name": "io.github.lewisdonovan/google-news",
+  "title": "Google News",
+  "description": "Search Google News, get top stories and read articles. No API key or headless browser.",
+  "repository": {
+    "url": "https://github.com/lewisdonovan/google-news-scraper",
+    "source": "github",
+    "subfolder": "mcp"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "google-news-mcp",
+      "version": "0.1.0",
+      "transport": { "type": "stdio" }
+    }
+  ]
+}

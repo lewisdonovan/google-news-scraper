@@ -1,0 +1,47 @@
+{
+  "name": "google-news-mcp",
+  "version": "0.1.0",
+  "mcpName": "io.github.lewisdonovan/google-news",
+  "description": "MCP server for Google News: search news, get top stories and read articles from any AI agent. No API key, no headless browser.",
+  "type": "module",
+  "bin": {
+    "google-news-mcp": "src/index.js"
+  },
+  "main": "src/index.js",
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lewisdonovan/google-news-scraper.git",
+    "directory": "mcp"
+  },
+  "homepage": "https://github.com/lewisdonovan/google-news-scraper/tree/master/mcp#readme",
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model context protocol",
+    "google news",
+    "news",
+    "news api",
+    "ai agents",
+    "claude",
+    "cursor",
+    "llm"
+  ],
+  "author": "Lewis Donovan",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "@mozilla/readability": "^0.6.0",
+    "google-news-scraper": "^3.0.3",
+    "jsdom": "^29.1.1",
+    "zod": "^4.6.7"
+  }
+}
