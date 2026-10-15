@@ -21,7 +21,7 @@ The server runs locally on your machine through `npx`. It sends:
 * your search terms, language and country to `news.google.com`, to fetch Google News results;
 * a request to each article URL you ask it to read, to fetch that page's HTML.
 
-It has no account, API key, analytics or telemetry, and sends nothing to any other server.
+It has no account, API key, analytics or telemetry, stores nothing, and sends nothing to any other server. Full details are in the [privacy policy](../../mcp/PRIVACY.md).
 
 ## License
 

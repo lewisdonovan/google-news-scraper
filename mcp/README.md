@@ -64,6 +64,10 @@ code --add-mcp '{"name":"google-news","command":"npx","args":["-y","google-news-
 * Google rate-limits bursts of requests from one IP. The scraper retries with backoff, but very heavy use can still get temporarily blocked.
 * `get_article_text` reads the page's HTML directly, so paywalled pages and sites that only render with JavaScript may return an error.
 
+## Privacy
+
+The server collects and stores nothing. It sends your queries to Google News and fetches the article pages you ask it to read. See the [privacy policy](PRIVACY.md).
+
 ## License
 
 [MIT](LICENSE)

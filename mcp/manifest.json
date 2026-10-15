@@ -59,5 +59,8 @@
     "runtimes": {
       "node": ">=20.19.0"
     }
-  }
+  },
+  "privacy_policies": [
+    "https://github.com/lewisdonovan/google-news-scraper/blob/master/mcp/PRIVACY.md"
+  ]
 }
