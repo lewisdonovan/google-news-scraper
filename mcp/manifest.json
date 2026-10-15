@@ -17,6 +17,7 @@
   "homepage": "https://github.com/lewisdonovan/google-news-scraper/tree/master/mcp",
   "documentation": "https://github.com/lewisdonovan/google-news-scraper/tree/master/mcp#readme",
   "support": "https://github.com/lewisdonovan/google-news-scraper/issues",
+  "icon": "icon.png",
   "server": {
     "type": "node",
     "entry_point": "src/index.js",
