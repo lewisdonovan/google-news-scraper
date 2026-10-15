@@ -3,7 +3,7 @@
   "manifest_version": "0.3",
   "name": "google-news",
   "display_name": "Google News",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Search Google News, get top stories and read articles. No API key or headless browser.",
   "long_description": "Gives Claude live news from Google News. Search for articles on any keyword with a timeframe, language and country, read the current top stories for any region or topic, and pull the readable text of an article. Results link to the real publisher URL rather than a Google redirect. Built on the open source google-news-scraper library.",
   "author": {

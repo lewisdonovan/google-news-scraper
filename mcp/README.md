@@ -20,7 +20,7 @@ Your MCP client starts the server itself, so there's nothing to keep running.
 
 ### Claude Desktop
 
-Download [google-news.mcpb](https://github.com/lewisdonovan/google-news-scraper/releases/download/mcp-v0.1.1/google-news.mcpb) and double-click it, or drag it into **Settings → Extensions**. Claude Desktop installs it with its own Node.js, so you don't need Node installed.
+Download [google-news.mcpb](https://github.com/lewisdonovan/google-news-scraper/releases/download/mcp-v0.1.2/google-news.mcpb) and double-click it, or drag it into **Settings → Extensions**. Claude Desktop installs it with its own Node.js, so you don't need Node installed.
 
 ### Claude Code
 

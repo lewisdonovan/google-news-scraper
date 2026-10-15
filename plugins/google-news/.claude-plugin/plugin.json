@@ -1,6 +1,6 @@
 {
   "name": "google-news",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Search Google News, get top stories and read articles. No API key or headless browser.",
   "icon": "icon.png",
   "author": {
