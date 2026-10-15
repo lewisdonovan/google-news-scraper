@@ -1,0 +1,23 @@
+name: MCP desktop extension
+on:
+  push:
+    tags:
+      - 'mcp-v*'
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mcp
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci --omit=dev
+      - run: npx -y @anthropic-ai/mcpb@2.1.2 pack . google-news.mcpb
+      - run: gh release create "$GITHUB_REF_NAME" google-news.mcpb --title "Google News MCP $GITHUB_REF_NAME" --notes "Claude Desktop extension. Download google-news.mcpb and double-click it to install." --latest=false
+        env:
+          GH_TOKEN: ${{ github.token }}

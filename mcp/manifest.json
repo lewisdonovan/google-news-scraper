@@ -1,0 +1,50 @@
+{
+  "$schema": "https://raw.githubusercontent.com/anthropics/mcpb/main/schemas/mcpb-manifest-v0.3.schema.json",
+  "manifest_version": "0.3",
+  "name": "google-news",
+  "display_name": "Google News",
+  "version": "0.1.0",
+  "description": "Search Google News, get top stories and read articles. No API key or headless browser.",
+  "long_description": "Gives Claude live news from Google News. Search for articles on any keyword with a timeframe, language and country, read the current top stories for any region or topic, and pull the readable text of an article. Results link to the real publisher URL rather than a Google redirect. Built on the open source google-news-scraper library.",
+  "author": {
+    "name": "Lewis Donovan",
+    "url": "https://github.com/lewisdonovan"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lewisdonovan/google-news-scraper"
+  },
+  "homepage": "https://github.com/lewisdonovan/google-news-scraper/tree/master/mcp",
+  "documentation": "https://github.com/lewisdonovan/google-news-scraper/tree/master/mcp#readme",
+  "support": "https://github.com/lewisdonovan/google-news-scraper/issues",
+  "server": {
+    "type": "node",
+    "entry_point": "src/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/src/index.js"]
+    }
+  },
+  "tools": [
+    {
+      "name": "search_news",
+      "description": "Search Google News for recent articles on any keyword, with a timeframe, language and country."
+    },
+    {
+      "name": "top_stories",
+      "description": "Get the current top stories for a country and language, or the stories on a Google News topic page."
+    },
+    {
+      "name": "get_article_text",
+      "description": "Fetch an article URL and return its readable body text, title, byline and publish time."
+    }
+  ],
+  "keywords": ["news", "google news", "search", "headlines", "articles"],
+  "license": "MIT",
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "node": ">=20.19.0"
+    }
+  }
+}

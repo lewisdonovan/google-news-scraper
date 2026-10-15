@@ -16,11 +16,25 @@ Each article comes back as `{ title, link, source, sourceUrl, datetime }`.
 
 ## Setup
 
-Requires Node.js 20.19 or later. Your MCP client starts the server itself, so there's nothing to keep running.
+Your MCP client starts the server itself, so there's nothing to keep running.
 
-### Claude Desktop, Cursor, Windsurf and most other clients
+### Claude Desktop
 
-Add this to the client's MCP config (`claude_desktop_config.json`, `.cursor/mcp.json`, and so on):
+Download [google-news.mcpb](https://github.com/lewisdonovan/google-news-scraper/releases/download/mcp-v0.1.0/google-news.mcpb) and double-click it, or drag it into **Settings → Extensions**. Claude Desktop installs it with its own Node.js, so you don't need Node installed.
+
+### Claude Code
+
+```bash
+/plugin install google-news --marketplace lewisdonovan/google-news-scraper
+```
+
+Or add the server directly with `claude mcp add google-news -- npx -y google-news-scraper-mcp`.
+
+### Cursor, Windsurf and most other clients
+
+Requires Node.js 20.19 or later.
+
+Add this to the client's MCP config (`.cursor/mcp.json`, `claude_desktop_config.json`, and so on):
 
 ```json
 {
@@ -31,12 +45,6 @@ Add this to the client's MCP config (`claude_desktop_config.json`, `.cursor/mcp.
     }
   }
 }
-```
-
-### Claude Code
-
-```bash
-claude mcp add google-news -- npx -y google-news-scraper-mcp
 ```
 
 ### VS Code
