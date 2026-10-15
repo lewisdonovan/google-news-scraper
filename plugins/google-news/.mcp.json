@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "google-news": {
+      "command": "npx",
+      "args": ["-y", "google-news-scraper-mcp"]
+    }
+  }
+}

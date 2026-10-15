@@ -28,3 +28,4 @@ jobs:
           node-version: 22
       - run: npm ci
       - run: npm test
+      - run: npx -y @anthropic-ai/mcpb@2.1.2 validate manifest.json

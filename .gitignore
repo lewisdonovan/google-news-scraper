@@ -5,3 +5,4 @@ run/
 # Claude memory
 MEMORY.md
 memory/
+*.mcpb

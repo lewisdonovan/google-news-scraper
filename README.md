@@ -236,7 +236,11 @@ Please report bugs via the [issue tracker](https://github.com/lewisdonovan/googl
 Feel free to [submit a PR](https://github.com/lewisdonovan/google-news-scraper/pulls) if you've fixed an open issue. Thank you.
 
 ## MCP server 🤖
-The [`mcp/`](mcp/) folder holds `google-news-scraper-mcp`, a Model Context Protocol server built on this package. Add it to Claude, Cursor, VS Code or any other MCP client and your agent gets three tools: `search_news`, `top_stories` and `get_article_text`. Setup instructions are in its [README](mcp/README.md).
+The [`mcp/`](mcp/) folder holds `google-news-scraper-mcp`, a Model Context Protocol server built on this package. Add it to Claude, Cursor, VS Code or any other MCP client and your agent gets three tools: `search_news`, `top_stories` and `get_article_text`.
+
+* **Claude Desktop:** download [google-news.mcpb](https://github.com/lewisdonovan/google-news-scraper/releases/download/mcp-v0.1.0/google-news.mcpb) and double-click it.
+* **Claude Code:** `/plugin install google-news --marketplace lewisdonovan/google-news-scraper`
+* **Everything else:** `npx -y google-news-scraper-mcp`, with setup instructions in its [README](mcp/README.md).
 
 ## Python version 🐍
 If you're looking for a Python version, there's one [here](https://github.com/morganbarber/python-news-scraper/). Please note, the Python version is a fork and is maintained separately. If you have any issues with the Python version, please open an issue on that repo instead here.

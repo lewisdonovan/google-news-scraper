@@ -1,0 +1,10 @@
+{
+  "name": "google-news",
+  "version": "0.1.0",
+  "description": "Search Google News, get top stories and read articles. No API key or headless browser.",
+  "author": { "name": "Lewis Donovan" },
+  "homepage": "https://github.com/lewisdonovan/google-news-scraper/tree/master/mcp",
+  "repository": "https://github.com/lewisdonovan/google-news-scraper",
+  "license": "MIT",
+  "keywords": ["news", "google news", "mcp"]
+}
