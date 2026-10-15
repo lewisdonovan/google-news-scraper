@@ -1,11 +1,11 @@
 {
-  "name": "google-news-mcp",
+  "name": "google-news-scraper-mcp",
   "version": "0.1.0",
   "mcpName": "io.github.lewisdonovan/google-news",
   "description": "MCP server for Google News: search news, get top stories and read articles from any AI agent. No API key, no headless browser.",
   "type": "module",
   "bin": {
-    "google-news-mcp": "src/index.js"
+    "google-news-scraper-mcp": "src/index.js"
   },
   "main": "src/index.js",
   "files": [

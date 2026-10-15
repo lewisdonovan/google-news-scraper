@@ -27,7 +27,7 @@ Add this to the client's MCP config (`claude_desktop_config.json`, `.cursor/mcp.
   "mcpServers": {
     "google-news": {
       "command": "npx",
-      "args": ["-y", "google-news-mcp"]
+      "args": ["-y", "google-news-scraper-mcp"]
     }
   }
 }
@@ -36,13 +36,13 @@ Add this to the client's MCP config (`claude_desktop_config.json`, `.cursor/mcp.
 ### Claude Code
 
 ```bash
-claude mcp add google-news -- npx -y google-news-mcp
+claude mcp add google-news -- npx -y google-news-scraper-mcp
 ```
 
 ### VS Code
 
 ```bash
-code --add-mcp '{"name":"google-news","command":"npx","args":["-y","google-news-mcp"]}'
+code --add-mcp '{"name":"google-news","command":"npx","args":["-y","google-news-scraper-mcp"]}'
 ```
 
 ## Example prompts

@@ -23,7 +23,7 @@ const articles = await googleNewsScraper({ searchTerm: "OpenAI", timeframe: "1d"
 
 Good for news monitoring, brand and competitor tracking, market research, trading signals, newsletters and feeding fresh context to AI agents.
 
-🤖 **Using an AI agent?** There's an [MCP server](mcp/) too, so Claude, Cursor and other MCP clients can search Google News directly: `npx -y google-news-mcp`.
+🤖 **Using an AI agent?** There's an [MCP server](mcp/) too, so Claude, Cursor and other MCP clients can search Google News directly: `npx -y google-news-scraper-mcp`.
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://donate.stripe.com/6oE7ue8n57wk4PS7ss)
 
@@ -236,7 +236,7 @@ Please report bugs via the [issue tracker](https://github.com/lewisdonovan/googl
 Feel free to [submit a PR](https://github.com/lewisdonovan/google-news-scraper/pulls) if you've fixed an open issue. Thank you.
 
 ## MCP server 🤖
-The [`mcp/`](mcp/) folder holds `google-news-mcp`, a Model Context Protocol server built on this package. Add it to Claude, Cursor, VS Code or any other MCP client and your agent gets three tools: `search_news`, `top_stories` and `get_article_text`. Setup instructions are in its [README](mcp/README.md).
+The [`mcp/`](mcp/) folder holds `google-news-scraper-mcp`, a Model Context Protocol server built on this package. Add it to Claude, Cursor, VS Code or any other MCP client and your agent gets three tools: `search_news`, `top_stories` and `get_article_text`. Setup instructions are in its [README](mcp/README.md).
 
 ## Python version 🐍
 If you're looking for a Python version, there's one [here](https://github.com/morganbarber/python-news-scraper/). Please note, the Python version is a fork and is maintained separately. If you have any issues with the Python version, please open an issue on that repo instead here.

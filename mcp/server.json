@@ -12,7 +12,7 @@
   "packages": [
     {
       "registryType": "npm",
-      "identifier": "google-news-mcp",
+      "identifier": "google-news-scraper-mcp",
       "version": "0.1.0",
       "transport": { "type": "stdio" }
     }
