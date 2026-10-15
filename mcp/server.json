@@ -8,12 +8,12 @@
     "source": "github",
     "subfolder": "mcp"
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "google-news-scraper-mcp",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "transport": { "type": "stdio" }
     }
   ]

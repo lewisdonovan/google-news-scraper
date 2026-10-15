@@ -10,7 +10,7 @@
       "name": "google-news",
       "source": "./plugins/google-news",
       "description": "Search Google News, get top stories and read articles. No API key or headless browser.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "author": {
         "name": "Lewis Donovan"
       },
