@@ -9,6 +9,18 @@ export type SearchParams =
   | { searchTerm: string; baseUrl?: string }
   | { baseUrl: string; searchTerm?: string };
 
+export type ThirdPartySource = 'serpapi';
+
+export type ThirdPartyConfig = {
+  source: ThirdPartySource;
+  apikey: string;
+  // true: call the provider first and fall back to the scraper if it fails.
+  // false: scrape first and only call the provider if the scraper fails.
+  primary?: boolean;
+  // Passed straight to the provider's API, and wins over anything derived from the top-level config
+  config?: Record<string, unknown>;
+};
+
 export type GNSUserConfig = SearchParams & {
   prettyURLs?: boolean;
   timeframe?: Timeframe;
@@ -19,6 +31,7 @@ export type GNSUserConfig = SearchParams & {
   queryVars?: QueryVars;
   filterWords?: string[];
   limit?: number;
+  third_party?: ThirdPartyConfig;
 };
 
 export type GNSConfig = SearchParams & {
@@ -31,6 +44,7 @@ export type GNSConfig = SearchParams & {
   queryVars: QueryVars;
   filterWords?: string[];
   limit: number;
+  third_party?: ThirdPartyConfig;
 };
 
 export type Article = {
@@ -44,6 +58,8 @@ export type Article = {
   content?: string;
   favicon?: string;
   sourceUrl?: string;
+  // Only set on articles from a third-party provider: the provider's result, unedited
+  rawResult?: Record<string, unknown>;
 };
 
 export type Articles = Article[];

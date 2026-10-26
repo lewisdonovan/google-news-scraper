@@ -14,8 +14,30 @@ import getPrettyUrl from './getPrettyUrl';
 import mapLimit from './mapLimit';
 import fetchWithRetry from './fetchWithRetry';
 import getArticleContent from './getArticleContent';
+import fetchThirdParty, { isSupportedSource } from './providers';
 const USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36';
 const PRETTY_URL_CONCURRENCY = 5;
+// Throws when Google can't be reached, so a third-party provider can step in
+const scrape = (config, logger) => __awaiter(void 0, void 0, void 0, function* () {
+    const url = buildFeedUrl(config);
+    logger.info(`📰 SCRAPING NEWS FROM: ${url}`);
+    const response = yield fetchWithRetry(url, {
+        headers: { 'User-Agent': USER_AGENT, 'Accept-Language': 'en-US,en;q=0.9' },
+    }).catch(error => { throw new Error(`Failed to fetch ${url}: ${error}`); });
+    if (!response.ok)
+        throw new Error(`Google News responded with ${response.status} for ${url}`);
+    const xml = yield response.text();
+    let results = parseFeed(xml)
+        .filter(article => article.title)
+        .slice(0, Math.max(0, config.limit));
+    if (config.prettyURLs) {
+        results = yield mapLimit(results, PRETTY_URL_CONCURRENCY, (article) => __awaiter(void 0, void 0, void 0, function* () {
+            const prettyUrl = yield getPrettyUrl(article.link, logger);
+            return prettyUrl ? Object.assign(Object.assign({}, article), { link: prettyUrl }) : article;
+        }));
+    }
+    return results;
+});
 const googleNewsScraper = (userConfig) => __awaiter(void 0, void 0, void 0, function* () {
     const config = Object.assign({
         prettyURLs: true,
@@ -28,31 +50,28 @@ const googleNewsScraper = (userConfig) => __awaiter(void 0, void 0, void 0, func
         limit: 99
     }, userConfig);
     const logger = getLogger(config.logLevel);
-    const url = buildFeedUrl(config);
-    logger.info(`📰 SCRAPING NEWS FROM: ${url}`);
-    let xml;
-    try {
-        const response = yield fetchWithRetry(url, {
-            headers: { 'User-Agent': USER_AGENT, 'Accept-Language': 'en-US,en;q=0.9' },
-        });
-        if (!response.ok) {
-            logger.error(`Google News responded with ${response.status} for ${url}`);
-            return [];
+    const thirdParty = config.third_party;
+    if (thirdParty && !isSupportedSource(thirdParty.source)) {
+        throw new Error(`Unsupported third_party source "${thirdParty.source}". Supported sources: serpapi.`);
+    }
+    if (thirdParty && !thirdParty.apikey) {
+        logger.warn('third_party has no apikey, so only the scraper will be used');
+    }
+    const scraper = () => scrape(config, logger);
+    const provider = () => fetchThirdParty(config, logger);
+    const sources = !(thirdParty === null || thirdParty === void 0 ? void 0 : thirdParty.apikey)
+        ? [scraper]
+        : thirdParty.primary === false ? [scraper, provider] : [provider, scraper];
+    let results = [];
+    for (const [i, source] of sources.entries()) {
+        try {
+            results = (yield source()).slice(0, Math.max(0, config.limit));
+            break;
         }
-        xml = yield response.text();
-    }
-    catch (error) {
-        logger.error(`Failed to fetch ${url}: ${error}`);
-        return [];
-    }
-    let results = parseFeed(xml)
-        .filter(article => article.title)
-        .slice(0, Math.max(0, config.limit));
-    if (config.prettyURLs) {
-        results = yield mapLimit(results, PRETTY_URL_CONCURRENCY, (article) => __awaiter(void 0, void 0, void 0, function* () {
-            const prettyUrl = yield getPrettyUrl(article.link, logger);
-            return prettyUrl ? Object.assign(Object.assign({}, article), { link: prettyUrl }) : article;
-        }));
+        catch (error) {
+            const fallingBack = i < sources.length - 1;
+            logger[fallingBack ? 'warn' : 'error'](`${error instanceof Error ? error.message : error}${fallingBack ? ', falling back' : ''}`);
+        }
     }
     if (config.getArticleContent && results.length) {
         let puppeteer;

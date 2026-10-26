@@ -5,6 +5,8 @@ import getPrettyUrl from './getPrettyUrl';
 import mapLimit from './mapLimit';
 import fetchWithRetry from './fetchWithRetry';
 import getArticleContent from './getArticleContent';
+import fetchThirdParty, { isSupportedSource } from './providers';
+import winston from 'winston';
 import {
   GNSUserConfig,
   GNSConfig,
@@ -13,6 +15,31 @@ import {
 
 const USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36';
 const PRETTY_URL_CONCURRENCY = 5;
+
+// Throws when Google can't be reached, so a third-party provider can step in
+const scrape = async (config: GNSConfig, logger: winston.Logger): Promise<Articles> => {
+  const url = buildFeedUrl(config);
+  logger.info(`📰 SCRAPING NEWS FROM: ${url}`);
+
+  const response = await fetchWithRetry(url, {
+    headers: { 'User-Agent': USER_AGENT, 'Accept-Language': 'en-US,en;q=0.9' },
+  }).catch(error => { throw new Error(`Failed to fetch ${url}: ${error}`); });
+  if (!response.ok) throw new Error(`Google News responded with ${response.status} for ${url}`);
+  const xml = await response.text();
+
+  let results: Articles = parseFeed(xml)
+    .filter(article => article.title)
+    .slice(0, Math.max(0, config.limit));
+
+  if (config.prettyURLs) {
+    results = await mapLimit(results, PRETTY_URL_CONCURRENCY, async article => {
+      const prettyUrl = await getPrettyUrl(article.link, logger);
+      return prettyUrl ? { ...article, link: prettyUrl } : article;
+    });
+  }
+
+  return results;
+}
 
 const googleNewsScraper = async (userConfig: GNSUserConfig): Promise<Articles> => {
   const config: GNSConfig = {
@@ -31,33 +58,29 @@ const googleNewsScraper = async (userConfig: GNSUserConfig): Promise<Articles> =
 
   const logger = getLogger(config.logLevel);
 
-  const url = buildFeedUrl(config);
-  logger.info(`📰 SCRAPING NEWS FROM: ${url}`);
-
-  let xml: string;
-  try {
-    const response = await fetchWithRetry(url, {
-      headers: { 'User-Agent': USER_AGENT, 'Accept-Language': 'en-US,en;q=0.9' },
-    });
-    if (!response.ok) {
-      logger.error(`Google News responded with ${response.status} for ${url}`);
-      return [];
-    }
-    xml = await response.text();
-  } catch (error) {
-    logger.error(`Failed to fetch ${url}: ${error}`);
-    return [];
+  const thirdParty = config.third_party;
+  if (thirdParty && !isSupportedSource(thirdParty.source)) {
+    throw new Error(`Unsupported third_party source "${thirdParty.source}". Supported sources: serpapi.`);
+  }
+  if (thirdParty && !thirdParty.apikey) {
+    logger.warn('third_party has no apikey, so only the scraper will be used');
   }
 
-  let results: Articles = parseFeed(xml)
-    .filter(article => article.title)
-    .slice(0, Math.max(0, config.limit));
+  const scraper = () => scrape(config, logger);
+  const provider = () => fetchThirdParty(config, logger);
+  const sources = !thirdParty?.apikey
+    ? [scraper]
+    : thirdParty.primary === false ? [scraper, provider] : [provider, scraper];
 
-  if (config.prettyURLs) {
-    results = await mapLimit(results, PRETTY_URL_CONCURRENCY, async article => {
-      const prettyUrl = await getPrettyUrl(article.link, logger);
-      return prettyUrl ? { ...article, link: prettyUrl } : article;
-    });
+  let results: Articles = [];
+  for (const [i, source] of sources.entries()) {
+    try {
+      results = (await source()).slice(0, Math.max(0, config.limit));
+      break;
+    } catch (error) {
+      const fallingBack = i < sources.length - 1;
+      logger[fallingBack ? 'warn' : 'error'](`${error instanceof Error ? error.message : error}${fallingBack ? ', falling back' : ''}`);
+    }
   }
 
   if (config.getArticleContent && results.length) {

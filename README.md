@@ -201,6 +201,30 @@ The total number of articles that you would like to be returned. Google News fee
 
 Defaults to `99` 
 
+#### third_party
+Optionally fetch results from a third-party news API instead of, or as a backup to, the scraper. This is handy when Google rate-limits your server's IP, which is common on cloud and datacenter hosts. The only source supported today is [SerpApi's Google News API](https://serpapi.com/google-news-api), which needs a SerpApi API key.
+
+```javascript
+const articles = await googleNewsScraper({
+    searchTerm: "The Oscars",
+    third_party: {
+        source: "serpapi",
+        apikey: process.env.SERPAPI_API_KEY,
+        primary: false,           // only use it when the scraper fails
+        config: { so: 1 },        // optional, passed straight to the third-party API
+    },
+});
+```
+
+* `source`: which provider to use. Currently `"serpapi"`.
+* `apikey`: your key for that provider. Without one, `third_party` is ignored and only the scraper runs.
+* `primary`: when `true`, the provider is called first and the scraper is only used if the provider fails. When `false`, the scraper runs first and the provider is only called if Google can't be reached or responds with an error. An empty set of results is not a failure, so it won't trigger the other one. Defaults to `true`.
+* `config`: any parameters from the provider's docs, sent as-is. `searchTerm`, `timeframe`, `baseUrl` (topic, section, publication and story pages) and the `hl`/`gl` query vars are translated for you, and anything in `config` wins over them.
+
+Results from a provider come back in the usual [output](#output-) shape, with `limit` and `getArticleContent` applied as normal. Because provider links already point at the publisher, `prettyURLs` isn't needed. Each article also gets a `rawResult` object holding the provider's original, unedited result, in case it has something the usual shape doesn't. SerpApi results usually include a thumbnail in `image` and the publisher's icon in `favicon` too.
+
+Defaults to `undefined`
+
 ## TypeScript 💙
 Google News Scraper includes full [TypeScript](https://typescriptlang.org/) definitions. 
 
