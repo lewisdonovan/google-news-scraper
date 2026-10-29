@@ -17,12 +17,27 @@ const localeVars = ({ language, country }) => {
   return vars;
 };
 
+// An optional third-party news API key lets results keep coming when Google rate-limits this IP.
+// Claude Desktop passes unset optional settings through as an empty string or the raw placeholder.
+export const thirdPartyFromEnv = (env = process.env) => {
+  const apikey = env.GOOGLE_NEWS_THIRD_PARTY_APIKEY?.trim();
+  if (!apikey || apikey.startsWith('${')) return {};
+  return {
+    third_party: {
+      source: env.GOOGLE_NEWS_THIRD_PARTY_SOURCE?.trim() || 'serpapi',
+      apikey,
+      primary: env.GOOGLE_NEWS_THIRD_PARTY_PRIMARY?.trim().toLowerCase() !== 'false',
+    },
+  };
+};
+
 // Drop fields that are always empty or duplicated so agents get compact results
 const toResult = ({ title, link, source, sourceUrl, datetime }) => ({ title, link, source, sourceUrl, datetime });
 
-export const searchNews = async ({ query, timeframe = '7d', language, country, limit = 20 }, scrape = googleNewsScraper) => {
+export const searchNews = async ({ query, timeframe = '7d', language, country, limit = 20 }, scrape = googleNewsScraper, env = process.env) => {
   const articles = await scrape({
     ...SILENT,
+    ...thirdPartyFromEnv(env),
     searchTerm: query,
     timeframe,
     limit,
@@ -31,9 +46,10 @@ export const searchNews = async ({ query, timeframe = '7d', language, country, l
   return articles.map(toResult);
 };
 
-export const topStories = async ({ topicUrl, language, country, limit = 20 }, scrape = googleNewsScraper) => {
+export const topStories = async ({ topicUrl, language, country, limit = 20 }, scrape = googleNewsScraper, env = process.env) => {
   const articles = await scrape({
     ...SILENT,
+    ...thirdPartyFromEnv(env),
     ...(topicUrl ? { baseUrl: topicUrl } : {}),
     limit,
     queryVars: localeVars({ language, country }),

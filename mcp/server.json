@@ -8,13 +8,26 @@
     "source": "github",
     "subfolder": "mcp"
   },
-  "version": "0.1.2",
+  "version": "0.2.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "google-news-scraper-mcp",
-      "version": "0.1.2",
-      "transport": { "type": "stdio" }
+      "version": "0.2.0",
+      "transport": { "type": "stdio" },
+      "environmentVariables": [
+        {
+          "name": "GOOGLE_NEWS_THIRD_PARTY_APIKEY",
+          "description": "Optional SerpApi API key, used when Google rate-limits the scraper or instead of it",
+          "isSecret": true,
+          "isRequired": false
+        },
+        {
+          "name": "GOOGLE_NEWS_THIRD_PARTY_PRIMARY",
+          "description": "\"false\" to scrape first and only use the API key as a fallback. Defaults to \"true\"",
+          "isRequired": false
+        }
+      ]
     }
   ]
 }

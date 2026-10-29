@@ -3,7 +3,7 @@
   "manifest_version": "0.3",
   "name": "google-news",
   "display_name": "Google News",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Search Google News, get top stories and read articles. No API key or headless browser.",
   "long_description": "Gives Claude live news from Google News. Search for articles on any keyword with a timeframe, language and country, read the current top stories for any region or topic, and pull the readable text of an article. Results link to the real publisher URL rather than a Google redirect. Built on the open source google-news-scraper library.",
   "author": {
@@ -25,7 +25,11 @@
       "command": "node",
       "args": [
         "${__dirname}/src/index.js"
-      ]
+      ],
+      "env": {
+        "GOOGLE_NEWS_THIRD_PARTY_APIKEY": "${user_config.third_party_apikey}",
+        "GOOGLE_NEWS_THIRD_PARTY_PRIMARY": "${user_config.third_party_primary}"
+      }
     }
   },
   "tools": [
@@ -42,6 +46,22 @@
       "description": "Fetch an article URL and return its readable body text, title, byline and publish time."
     }
   ],
+  "user_config": {
+    "third_party_apikey": {
+      "type": "string",
+      "title": "SerpApi API key (optional)",
+      "description": "Fetch news through SerpApi's Google News API when Google rate-limits you, or instead of scraping. Leave blank to use the free scraper only.",
+      "sensitive": true,
+      "required": false
+    },
+    "third_party_primary": {
+      "type": "boolean",
+      "title": "Use SerpApi first",
+      "description": "On: call SerpApi first and scrape only if it fails. Off: scrape first and call SerpApi only if Google can't be reached. Only applies when a key is set.",
+      "default": true,
+      "required": false
+    }
+  },
   "keywords": [
     "news",
     "google news",

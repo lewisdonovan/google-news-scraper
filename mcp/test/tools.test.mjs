@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { searchNews, topStories, extractArticle, getArticleText } from '../src/tools.js';
+import { searchNews, topStories, extractArticle, getArticleText, thirdPartyFromEnv } from '../src/tools.js';
 
 const article = {
   title: 'Headline', link: 'https://example.com/a', image: '', source: 'Example',
@@ -40,6 +40,29 @@ test('topStories reads the front page unless a topic URL is given', async () => 
   assert.equal(calls[0].baseUrl, undefined);
   assert.equal(calls[0].searchTerm, undefined);
   assert.equal(calls[1].baseUrl, 'https://news.google.com/topics/ABC');
+});
+
+test('thirdPartyFromEnv is empty without an api key', () => {
+  assert.deepEqual(thirdPartyFromEnv({}), {});
+  assert.deepEqual(thirdPartyFromEnv({ GOOGLE_NEWS_THIRD_PARTY_APIKEY: '  ' }), {});
+  assert.deepEqual(thirdPartyFromEnv({ GOOGLE_NEWS_THIRD_PARTY_APIKEY: '${user_config.third_party_apikey}' }), {});
+});
+
+test('thirdPartyFromEnv defaults to serpapi as the primary source', () => {
+  assert.deepEqual(thirdPartyFromEnv({ GOOGLE_NEWS_THIRD_PARTY_APIKEY: 'KEY' }), {
+    third_party: { source: 'serpapi', apikey: 'KEY', primary: true },
+  });
+  assert.equal(thirdPartyFromEnv({ GOOGLE_NEWS_THIRD_PARTY_APIKEY: 'KEY', GOOGLE_NEWS_THIRD_PARTY_PRIMARY: 'false' }).third_party.primary, false);
+});
+
+test('searchNews and topStories pass the third-party config to the scraper', async () => {
+  const { calls, scrape } = recordingScraper();
+  const env = { GOOGLE_NEWS_THIRD_PARTY_APIKEY: 'KEY', GOOGLE_NEWS_THIRD_PARTY_PRIMARY: 'false' };
+  await searchNews({ query: 'x' }, scrape, env);
+  await topStories({}, scrape, env);
+  for (const call of calls) {
+    assert.deepEqual(call.third_party, { source: 'serpapi', apikey: 'KEY', primary: false });
+  }
 });
 
 const page = `<!doctype html><html><head><title>Rates rise</title></head><body>
