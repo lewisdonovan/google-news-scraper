@@ -31,6 +31,7 @@ describe('googleNewsScraper', () => {
     expect(articles[0].title).to.equal("Tesla's China-made EV sales quicken in September")
     expect(articles[0].source).to.equal('Reuters')
     expect(articles[0].link).to.equal('https://publisher.example/story')
+    expect(articles[0].provider).to.equal('scraper')
     expect(new Date(articles[0].datetime).getTime()).to.be.greaterThan(0)
   })
 
@@ -90,6 +91,7 @@ describe('googleNewsScraper', () => {
       expect(articles).to.have.length(4)
       expect(articles[0].source).to.equal('Reuters')
       expect(articles[0].rawResult).to.eql(searchResponse.news_results[0])
+      expect(articles[0].provider).to.equal('serpapi')
       expect(calledGoogle()).to.be(false)
       const url = new URL(global.fetch.mock.calls[0][0])
       expect(url.searchParams.get('api_key')).to.equal('KEY')
@@ -106,6 +108,7 @@ describe('googleNewsScraper', () => {
       const articles = await gns({ searchTerm: 'tesla', prettyURLs: false, third_party, logLevel: 'none' })
       expect(articles).to.have.length(2)
       expect(articles[0].rawResult).to.be(undefined)
+      expect(articles[0].provider).to.equal('scraper')
       expect(calledGoogle()).to.be(true)
     })
 
@@ -123,6 +126,7 @@ describe('googleNewsScraper', () => {
       mockGoogle({ feedOk: false })
       const articles = await gns({ searchTerm: 'tesla', third_party: { ...third_party, primary: false }, logLevel: 'none' })
       expect(articles).to.have.length(4)
+      expect(articles[0].provider).to.equal('serpapi')
       expect(calledProvider()).to.be(true)
     })
 

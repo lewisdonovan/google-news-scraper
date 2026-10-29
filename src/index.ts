@@ -10,11 +10,15 @@ import winston from 'winston';
 import {
   GNSUserConfig,
   GNSConfig,
-  Articles
+  Articles,
+  Provider,
+  ThirdPartySource
 } from "./types"
 
 const USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36';
 const PRETTY_URL_CONCURRENCY = 5;
+
+type Source = [Provider, () => Promise<Articles>];
 
 // Throws when Google can't be reached, so a third-party provider can step in
 const scrape = async (config: GNSConfig, logger: winston.Logger): Promise<Articles> => {
@@ -66,16 +70,18 @@ const googleNewsScraper = async (userConfig: GNSUserConfig): Promise<Articles> =
     logger.warn('third_party has no apikey, so only the scraper will be used');
   }
 
-  const scraper = () => scrape(config, logger);
-  const provider = () => fetchThirdParty(config, logger);
+  const scraper: Source = ['scraper', () => scrape(config, logger)];
+  const provider: Source = [thirdParty?.source as ThirdPartySource, () => fetchThirdParty(config, logger)];
   const sources = !thirdParty?.apikey
     ? [scraper]
     : thirdParty.primary === false ? [scraper, provider] : [provider, scraper];
 
   let results: Articles = [];
-  for (const [i, source] of sources.entries()) {
+  for (const [i, [name, fetchArticles]] of sources.entries()) {
     try {
-      results = (await source()).slice(0, Math.max(0, config.limit));
+      results = (await fetchArticles())
+        .slice(0, Math.max(0, config.limit))
+        .map(article => ({ ...article, provider: name }));
       break;
     } catch (error) {
       const fallingBack = i < sources.length - 1;

@@ -11,6 +11,7 @@ export type SearchParams = {
     searchTerm?: string;
 };
 export type ThirdPartySource = 'serpapi';
+export type Provider = 'scraper' | ThirdPartySource;
 export type ThirdPartyConfig = {
     source: ThirdPartySource;
     apikey: string;
@@ -52,6 +53,7 @@ export type Article = {
     content?: string;
     favicon?: string;
     sourceUrl?: string;
+    provider?: Provider;
     rawResult?: Record<string, unknown>;
 };
 export type Articles = Article[];
