@@ -1,3 +1,11 @@
+# [3.2.0](https://github.com/lewisdonovan/google-news-scraper/compare/v3.1.0...v3.2.0) (2026-10-29)
+
+
+### Features
+
+* **mcp:** optional third-party API key via environment variables ([b4ac1b1](https://github.com/lewisdonovan/google-news-scraper/commit/b4ac1b1cf7de3d7250cdffcb3c65a07aca6e643a))
+* tag each article with the provider that served it ([0925792](https://github.com/lewisdonovan/google-news-scraper/commit/09257929bc71c23801ee588ea10415903accb20b))
+
 # [3.1.0](https://github.com/lewisdonovan/google-news-scraper/compare/v3.0.3...v3.1.0) (2026-10-29)
 
 
