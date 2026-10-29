@@ -10,6 +10,13 @@ export type SearchParams = {
     baseUrl: string;
     searchTerm?: string;
 };
+export type ThirdPartySource = 'serpapi';
+export type ThirdPartyConfig = {
+    source: ThirdPartySource;
+    apikey: string;
+    primary?: boolean;
+    config?: Record<string, unknown>;
+};
 export type GNSUserConfig = SearchParams & {
     prettyURLs?: boolean;
     timeframe?: Timeframe;
@@ -20,6 +27,7 @@ export type GNSUserConfig = SearchParams & {
     queryVars?: QueryVars;
     filterWords?: string[];
     limit?: number;
+    third_party?: ThirdPartyConfig;
 };
 export type GNSConfig = SearchParams & {
     prettyURLs: boolean;
@@ -31,6 +39,7 @@ export type GNSConfig = SearchParams & {
     queryVars: QueryVars;
     filterWords?: string[];
     limit: number;
+    third_party?: ThirdPartyConfig;
 };
 export type Article = {
     title: string;
@@ -43,6 +52,7 @@ export type Article = {
     content?: string;
     favicon?: string;
     sourceUrl?: string;
+    rawResult?: Record<string, unknown>;
 };
 export type Articles = Article[];
 export interface GetArticleContentProps {
