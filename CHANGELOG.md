@@ -1,3 +1,10 @@
+# [3.1.0](https://github.com/lewisdonovan/google-news-scraper/compare/v3.0.3...v3.1.0) (2026-10-29)
+
+
+### Features
+
+* add optional third-party provider, starting with SerpApi ([420d491](https://github.com/lewisdonovan/google-news-scraper/commit/420d4915bec6ae782fb35c6491f5dfa7796af78e))
+
 ## [3.0.3](https://github.com/lewisdonovan/google-news-scraper/compare/v3.0.2...v3.0.3) (2026-10-14)
 
 
