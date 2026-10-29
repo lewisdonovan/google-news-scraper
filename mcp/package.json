@@ -1,6 +1,6 @@
 {
   "name": "google-news-scraper-mcp",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "mcpName": "io.github.lewisdonovan/google-news",
   "description": "MCP server for Google News: search news, get top stories and read articles from any AI agent. No API key, no headless browser.",
   "type": "module",
@@ -41,7 +41,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.32.1",
     "@mozilla/readability": "^0.6.0",
-    "google-news-scraper": "^3.0.3",
+    "google-news-scraper": "^3.1.0",
     "jsdom": "^29.1.1",
     "zod": "^4.6.7"
   }

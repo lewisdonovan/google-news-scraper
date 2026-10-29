@@ -98,10 +98,13 @@ The output is an array of JSON objects, with each article following the structur
         "sourceUrl": "https://url-to-website.com",
         "datetime": "2024-05-13T08:02:22.000Z",
         "time":  "2 hours ago",
-        "articleType": "regular"
+        "articleType": "regular",
+        "provider": "scraper"
     }
 ]
 ```
+
+`provider` says where the article came from: `"scraper"`, or the source name (such as `"serpapi"`) when it was fetched through [third_party](#third_party).
 
 `image` is always an empty string, because Google News feeds don't include thumbnails. It's kept so code written for v2 doesn't break.
 
@@ -221,7 +224,7 @@ const articles = await googleNewsScraper({
 * `primary`: when `true`, the provider is called first and the scraper is only used if the provider fails. When `false`, the scraper runs first and the provider is only called if Google can't be reached or responds with an error. An empty set of results is not a failure, so it won't trigger the other one. Defaults to `true`.
 * `config`: any parameters from the provider's docs, sent as-is. `searchTerm`, `timeframe`, `baseUrl` (topic, section, publication and story pages) and the `hl`/`gl` query vars are translated for you, and anything in `config` wins over them.
 
-Results from a provider come back in the usual [output](#output-) shape, with `limit` and `getArticleContent` applied as normal. Because provider links already point at the publisher, `prettyURLs` isn't needed. Each article also gets a `rawResult` object holding the provider's original, unedited result, in case it has something the usual shape doesn't. SerpApi results usually include a thumbnail in `image` and the publisher's icon in `favicon` too.
+Results from a provider come back in the usual [output](#output-) shape, with `limit` and `getArticleContent` applied as normal. Because provider links already point at the publisher, `prettyURLs` isn't needed. Their `provider` is the source name, so you can tell when a fallback kicked in. Each article also gets a `rawResult` object holding the provider's original, unedited result, in case it has something the usual shape doesn't. SerpApi results usually include a thumbnail in `image` and the publisher's icon in `favicon` too.
 
 Defaults to `undefined`
 
@@ -262,7 +265,7 @@ Feel free to [submit a PR](https://github.com/lewisdonovan/google-news-scraper/p
 ## MCP server 🤖
 The [`mcp/`](mcp/) folder holds `google-news-scraper-mcp`, a Model Context Protocol server built on this package. Add it to Claude, Cursor, VS Code or any other MCP client and your agent gets three tools: `search_news`, `top_stories` and `get_article_text`.
 
-* **Claude Desktop:** download [google-news.mcpb](https://github.com/lewisdonovan/google-news-scraper/releases/download/mcp-v0.1.2/google-news.mcpb) and double-click it.
+* **Claude Desktop:** download [google-news.mcpb](https://github.com/lewisdonovan/google-news-scraper/releases/download/mcp-v0.2.0/google-news.mcpb) and double-click it.
 * **Claude Code:** `/plugin install google-news --marketplace lewisdonovan/google-news-scraper`
 * **Everything else:** `npx -y google-news-scraper-mcp`, with setup instructions in its [README](mcp/README.md).
 

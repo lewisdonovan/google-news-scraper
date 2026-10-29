@@ -11,6 +11,9 @@ export type SearchParams =
 
 export type ThirdPartySource = 'serpapi';
 
+// Where an article came from: the built-in scraper or a third-party source
+export type Provider = 'scraper' | ThirdPartySource;
+
 export type ThirdPartyConfig = {
   source: ThirdPartySource;
   apikey: string;
@@ -58,6 +61,7 @@ export type Article = {
   content?: string;
   favicon?: string;
   sourceUrl?: string;
+  provider?: Provider;
   // Only set on articles from a third-party provider: the provider's result, unedited
   rawResult?: Record<string, unknown>;
 };

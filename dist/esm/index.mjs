@@ -3447,15 +3447,17 @@ const googleNewsScraper = (userConfig) => __awaiter(void 0, void 0, void 0, func
     if (thirdParty && !thirdParty.apikey) {
         logger.warn('third_party has no apikey, so only the scraper will be used');
     }
-    const scraper = () => scrape(config, logger);
-    const provider = () => fetchThirdParty(config, logger);
+    const scraper = ['scraper', () => scrape(config, logger)];
+    const provider = [thirdParty === null || thirdParty === void 0 ? void 0 : thirdParty.source, () => fetchThirdParty(config, logger)];
     const sources = !(thirdParty === null || thirdParty === void 0 ? void 0 : thirdParty.apikey)
         ? [scraper]
         : thirdParty.primary === false ? [scraper, provider] : [provider, scraper];
     let results = [];
-    for (const [i, source] of sources.entries()) {
+    for (const [i, [name, fetchArticles]] of sources.entries()) {
         try {
-            results = (yield source()).slice(0, Math.max(0, config.limit));
+            results = (yield fetchArticles())
+                .slice(0, Math.max(0, config.limit))
+                .map(article => (Object.assign(Object.assign({}, article), { provider: name })));
             break;
         }
         catch (error) {
