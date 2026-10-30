@@ -1,10 +1,10 @@
 {
   "name": "google-news-plugin",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "private": true,
   "description": "Pins the MCP server the google-news Claude Code plugin launches.",
   "license": "MIT",
   "dependencies": {
-    "google-news-scraper-mcp": "0.1.2"
+    "google-news-scraper-mcp": "0.2.0"
   }
 }
