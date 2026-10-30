@@ -1,6 +1,7 @@
 import winston from 'winston';
 import * as cheerio from 'cheerio';
 import { VirtualConsole, JSDOM } from 'jsdom';
+import { createHash } from 'crypto';
 
 const config = {
     levels: {
@@ -3223,6 +3224,80 @@ const cleanText = (text, filterWords) => text
     .filter(line => !filterWords.some(word => line.toLowerCase().includes(word)))
     .join('\n');
 
+const ARTICLE_TYPES = /Article|BlogPosting|Report/;
+const toIso = (value) => {
+    const date = new Date(String(value !== null && value !== void 0 ? value : ''));
+    return value && !isNaN(date.getTime()) ? date.toISOString() : '';
+};
+const names = (value) => {
+    const list = Array.isArray(value) ? value : value ? [value] : [];
+    return list
+        .map(item => typeof item === 'string' ? item : item === null || item === void 0 ? void 0 : item.name)
+        .filter((name) => typeof name === 'string')
+        .map(name => name.trim())
+        .filter(name => name && !/^https?:\/\//.test(name));
+};
+const splitList = (value) => value.split(',').map(item => item.trim()).filter(Boolean);
+const unique = (items) => [...new Set(items)];
+// The first NewsArticle-like object in the page's JSON-LD, looking inside @graph too
+const findArticleLd = ($) => {
+    for (const script of $('script[type="application/ld+json"]').toArray()) {
+        let data;
+        try {
+            data = JSON.parse($(script).text());
+        }
+        catch (_a) {
+            continue;
+        }
+        const nodes = [data].flat().flatMap((node) => { var _a; return (_a = node === null || node === void 0 ? void 0 : node['@graph']) !== null && _a !== void 0 ? _a : [node]; });
+        const article = nodes.find((node) => ARTICLE_TYPES.test([node === null || node === void 0 ? void 0 : node['@type']].flat().join(' ')));
+        if (article)
+            return article;
+    }
+    return {};
+};
+// Reads the metadata publishers put in the page head, preferring JSON-LD over meta tags
+const getPageMetadata = (html, pageUrl) => {
+    var _a, _b, _c, _d, _e;
+    const $ = cheerio.load(html);
+    const meta = (...keys) => {
+        var _a;
+        for (const key of keys) {
+            const value = (_a = $(`meta[property="${key}"], meta[name="${key}"]`).first().attr('content')) === null || _a === void 0 ? void 0 : _a.trim();
+            if (value)
+                return value;
+        }
+        return '';
+    };
+    const metaAll = (key) => $(`meta[property="${key}"], meta[name="${key}"]`).toArray()
+        .map(el => { var _a, _b; return (_b = (_a = $(el).attr('content')) === null || _a === void 0 ? void 0 : _a.trim()) !== null && _b !== void 0 ? _b : ''; }).filter(Boolean);
+    const absolute = (url) => {
+        try {
+            return url ? new URL(url, pageUrl).href : '';
+        }
+        catch (_a) {
+            return '';
+        }
+    };
+    const ld = findArticleLd($);
+    const ldKeywords = Array.isArray(ld.keywords) ? ld.keywords.map(String) : splitList(String((_a = ld.keywords) !== null && _a !== void 0 ? _a : ''));
+    const ldImage = [ld.image].flat()[0];
+    return {
+        authors: unique(names(ld.author).length ? names(ld.author) : names([...metaAll('author'), ...metaAll('article:author')])),
+        language: ($('html').attr('lang') || meta('og:locale') || String((_b = ld.inLanguage) !== null && _b !== void 0 ? _b : '')).trim(),
+        excerpt: meta('description', 'og:description', 'twitter:description') || String((_c = ld.description) !== null && _c !== void 0 ? _c : '').trim(),
+        canonicalUrl: absolute($('link[rel="canonical"]').attr('href') || meta('og:url')) || pageUrl,
+        publishedAt: toIso(meta('article:published_time') || ld.datePublished),
+        modifiedAt: toIso(meta('article:modified_time', 'og:updated_time') || ld.dateModified),
+        keywords: unique(ldKeywords.length ? ldKeywords : [
+            ...splitList(meta('news_keywords', 'keywords')),
+            ...metaAll('article:tag'),
+        ]),
+        section: meta('article:section') || String((_d = [ld.articleSection].flat()[0]) !== null && _d !== void 0 ? _d : '').trim(),
+        image: absolute(meta('og:image', 'twitter:image') || (typeof ldImage === 'string' ? ldImage : (_e = ldImage === null || ldImage === void 0 ? void 0 : ldImage.url) !== null && _e !== void 0 ? _e : '')),
+    };
+};
+
 var __awaiter$2 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -3232,12 +3307,31 @@ var __awaiter$2 = (undefined && undefined.__awaiter) || function (thisArg, _argu
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest$1 = (undefined && undefined.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 const verifyMessages = [
     "you are human",
     "are you human",
     "i'm not a robot",
     "recaptcha"
 ];
+const countWords = (text) => text.split(/\s+/).filter(Boolean).length;
+// Page metadata fills gaps in what the feed gave us, but never overwrites it
+const withMetadata = (article, metadata, parsed) => {
+    var _a, _b;
+    const { image, authors, language, excerpt } = metadata, rest = __rest$1(metadata, ["image", "authors", "language", "excerpt"]);
+    const byline = (_a = parsed === null || parsed === void 0 ? void 0 : parsed.byline) === null || _a === void 0 ? void 0 : _a.replace(/^by\s+/i, '').trim();
+    return Object.assign(Object.assign(Object.assign({}, article), rest), { image: article.image || image, authors: ((_b = article.authors) === null || _b === void 0 ? void 0 : _b.length) ? article.authors : authors.length ? authors : byline ? [byline] : [], language: language || (parsed === null || parsed === void 0 ? void 0 : parsed.lang) || '', excerpt: excerpt || (parsed === null || parsed === void 0 ? void 0 : parsed.excerpt) || '' });
+};
 const getArticleContent = (_a) => __awaiter$2(void 0, [_a], void 0, function* ({ articles, browser, filterWords, logger }) {
     try {
         const processedArticlesPromises = articles.map(article => extractArticleContentAndFavicon({ article, browser, filterWords, logger }));
@@ -3252,42 +3346,68 @@ const getArticleContent = (_a) => __awaiter$2(void 0, [_a], void 0, function* ({
 const extractArticleContentAndFavicon = (_a) => __awaiter$2(void 0, [_a], void 0, function* ({ article, browser, filterWords, logger }) {
     var _b;
     const page = yield browser.newPage();
+    let favicon = '';
+    const result = (status, content = '', extra = {}) => (Object.assign(Object.assign(Object.assign({}, article), extra), { content, favicon, contentStatus: status, wordCount: countWords(content) }));
     try {
         yield page.goto(article.link, { waitUntil: 'networkidle2' });
         const content = yield page.evaluate(() => document.documentElement.innerHTML);
-        const favicon = (_b = yield page.evaluate(() => {
+        favicon = (_b = yield page.evaluate(() => {
             const link = document.querySelector('link[rel="icon"], link[rel="shortcut icon"]');
             return link ? link.getAttribute('href') : '';
         })) !== null && _b !== void 0 ? _b : "";
+        const pageUrl = page.url() || article.link;
+        const metadata = getPageMetadata(content, pageUrl);
         const virtualConsole = new VirtualConsole();
         virtualConsole.on("error", logger.error);
-        const dom = new JSDOM(content, { url: article.link, virtualConsole });
+        const dom = new JSDOM(content, { url: pageUrl, virtualConsole });
         let reader = new readabilityExports.Readability(dom.window.document);
         const articleContent = reader.parse();
+        const enriched = withMetadata(article, metadata, articleContent);
         if (!articleContent || !articleContent.textContent) {
             logger.warn("Article content could not be parsed or is empty.", { article });
-            return Object.assign(Object.assign({}, article), { content: '', favicon });
+            return result('unparseable', '', enriched);
         }
         const hasVerifyMessage = verifyMessages.find(w => { var _a; return ((_a = articleContent.textContent) !== null && _a !== void 0 ? _a : '').toLowerCase().includes(w); });
         if (hasVerifyMessage) {
             logger.warn("Article requires human verification.", { article });
-            return Object.assign(Object.assign({}, article), { content: '', favicon });
+            return result('blocked', '', enriched);
         }
         const cleanedText = cleanText(articleContent.textContent, filterWords || []);
         if (cleanedText.split(' ').length < 100) {
             logger.warn("Article content is too short and likely not valuable.", { article });
-            return Object.assign(Object.assign({}, article), { content: '', favicon });
+            return result('too_short', '', enriched);
         }
         logger.info("SUCCESSFULLY SCRAPED ARTICLE CONTENT:", cleanedText);
-        return Object.assign(Object.assign({}, article), { content: cleanedText, favicon });
+        return result('ok', cleanedText, enriched);
     }
     catch (error) {
         logger.error(error);
-        return Object.assign(Object.assign({}, article), { content: '', favicon: '' });
+        favicon = '';
+        return result('error');
     }
     finally {
         yield page.close();
     }
+});
+
+const articleId = (link) => createHash('sha256').update(link).digest('hex').slice(0, 16);
+// Publisher hostname without "www.", from the source url or, failing that, the link
+const domainOf = ({ sourceUrl, link }) => {
+    for (const url of [sourceUrl, link]) {
+        try {
+            const { hostname } = new URL(url !== null && url !== void 0 ? url : '');
+            if (hostname && hostname !== 'news.google.com')
+                return hostname.replace(/^www\./, '');
+        }
+        catch (_a) { }
+    }
+    return '';
+};
+// Fields every article gets, whichever provider served it
+const enrichArticles = (articles, { query, retrievedAt }) => articles.map((article, i) => {
+    var _a;
+    return (Object.assign(Object.assign({}, article), { position: i + 1, id: articleId(article.link), domain: domainOf(article), authors: (_a = article.authors) !== null && _a !== void 0 ? _a : [], query,
+        retrievedAt }));
 });
 
 var __awaiter$1 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -3347,6 +3467,11 @@ const buildParams = (config) => {
     params.api_key = config.third_party.apikey;
     return params;
 };
+const authorsOf = (result) => {
+    var _a, _b, _c;
+    return [...((_b = (_a = result.source) === null || _a === void 0 ? void 0 : _a.authors) !== null && _b !== void 0 ? _b : []), (_c = result.author) === null || _c === void 0 ? void 0 : _c.name]
+        .filter((name) => typeof name === 'string' && name.trim() !== '');
+};
 const toArticle = (result, now) => {
     var _a, _b, _c, _d, _e, _f, _g, _h;
     const published = new Date(result.iso_date);
@@ -3356,7 +3481,7 @@ const toArticle = (result, now) => {
         sourceUrl = new URL(result.link).origin;
     }
     catch (_j) { }
-    return Object.assign(Object.assign({ title: (_a = result.title) !== null && _a !== void 0 ? _a : '', link: (_b = result.link) !== null && _b !== void 0 ? _b : '', image: (_c = result.thumbnail) !== null && _c !== void 0 ? _c : '', source: (_g = (_e = (_d = result.source) === null || _d === void 0 ? void 0 : _d.name) !== null && _e !== void 0 ? _e : (_f = result.author) === null || _f === void 0 ? void 0 : _f.name) !== null && _g !== void 0 ? _g : '', sourceUrl, datetime: valid ? published.toISOString() : '', time: valid ? timeAgo(published, now) : '', articleType: 'regular' }, (((_h = result.source) === null || _h === void 0 ? void 0 : _h.icon) ? { favicon: result.source.icon } : {})), { rawResult: result });
+    return Object.assign(Object.assign({ title: (_a = result.title) !== null && _a !== void 0 ? _a : '', link: (_b = result.link) !== null && _b !== void 0 ? _b : '', image: (_c = result.thumbnail) !== null && _c !== void 0 ? _c : '', source: (_g = (_e = (_d = result.source) === null || _d === void 0 ? void 0 : _d.name) !== null && _e !== void 0 ? _e : (_f = result.author) === null || _f === void 0 ? void 0 : _f.name) !== null && _g !== void 0 ? _g : '', sourceUrl, datetime: valid ? published.toISOString() : '', time: valid ? timeAgo(published, now) : '', articleType: 'regular' }, (((_h = result.source) === null || _h === void 0 ? void 0 : _h.icon) ? { favicon: result.source.icon } : {})), { authors: authorsOf(result), rawResult: result });
 };
 // Front pages group articles into story clusters with a highlight and related stories
 // instead of a top-level link, so clusters are flattened into their articles
@@ -3452,12 +3577,15 @@ const googleNewsScraper = (userConfig) => __awaiter(void 0, void 0, void 0, func
     const sources = !(thirdParty === null || thirdParty === void 0 ? void 0 : thirdParty.apikey)
         ? [scraper]
         : thirdParty.primary === false ? [scraper, provider] : [provider, scraper];
+    const query = config.searchTerm || config.baseUrl || 'https://news.google.com/';
+    const retrievedAt = new Date().toISOString();
     let results = [];
     for (const [i, [name, fetchArticles]] of sources.entries()) {
         try {
             results = (yield fetchArticles())
                 .slice(0, Math.max(0, config.limit))
                 .map(article => (Object.assign(Object.assign({}, article), { provider: name })));
+            results = enrichArticles(results, { query, retrievedAt });
             break;
         }
         catch (error) {

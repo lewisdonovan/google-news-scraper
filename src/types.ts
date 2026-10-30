@@ -50,6 +50,9 @@ export type GNSConfig = SearchParams & {
   third_party?: ThirdPartyConfig;
 };
 
+// Why an article's content is or isn't there, when getArticleContent is on
+export type ContentStatus = 'ok' | 'blocked' | 'too_short' | 'unparseable' | 'error';
+
 export type Article = {
   title: string;
   link: string;
@@ -62,6 +65,27 @@ export type Article = {
   favicon?: string;
   sourceUrl?: string;
   provider?: Provider;
+  // 1-based rank in the results
+  position?: number;
+  // Stable hash of the link, for deduplicating across runs
+  id?: string;
+  // Publisher hostname, without "www."
+  domain?: string;
+  authors?: string[];
+  // The search term, or the page url for topics and top stories
+  query?: string;
+  // When the results were fetched, as an ISO timestamp
+  retrievedAt?: string;
+  // The fields below are only set when getArticleContent is on
+  contentStatus?: ContentStatus;
+  wordCount?: number;
+  language?: string;
+  excerpt?: string;
+  canonicalUrl?: string;
+  publishedAt?: string;
+  modifiedAt?: string;
+  keywords?: string[];
+  section?: string;
   // Only set on articles from a third-party provider: the provider's result, unedited
   rawResult?: Record<string, unknown>;
 };

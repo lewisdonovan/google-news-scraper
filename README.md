@@ -99,14 +99,30 @@ The output is an array of JSON objects, with each article following the structur
         "datetime": "2024-05-13T08:02:22.000Z",
         "time":  "2 hours ago",
         "articleType": "regular",
-        "provider": "scraper"
+        "provider": "scraper",
+        "position": 1,
+        "id": "3f9a1c2b7d4e6f80",
+        "domain": "url-to-website.com",
+        "authors": [],
+        "query": "The Oscars",
+        "retrievedAt": "2024-05-13T10:02:22.000Z"
     }
 ]
 ```
 
 `provider` says where the article came from: `"scraper"`, or the source name (such as `"serpapi"`) when it was fetched through [third_party](#third_party).
 
-`image` is always an empty string, because Google News feeds don't include thumbnails. It's kept so code written for v2 doesn't break.
+`position` is the article's rank in the results, starting at 1.
+
+`id` is a short hash of the link, so the same article gets the same id on every run. Use it to deduplicate results collected over time. With `prettyURLs: false` it's a hash of the Google link instead of the publisher's.
+
+`domain` is the publisher's hostname without `www.`, handy for grouping or filtering by outlet.
+
+`authors` lists the article's authors when they're known. Google News feeds don't name authors, so they're usually only filled in with [getArticleContent](#getarticlecontent).
+
+`query` is the search term, or the page URL for topics and top stories. `retrievedAt` is when the results were fetched. Both are the same for every article in a run, and help keep track of where data came from once you've merged many runs.
+
+`image` is empty unless [getArticleContent](#getarticlecontent) is on, because Google News feeds don't include thumbnails.
 
 ## Config ⚙️
 The config object passed to the function above has the following properties:
@@ -139,28 +155,51 @@ The format of the timeframe is a string comprised of a number, followed by a let
 Defaults to `7d`.
 
 #### getArticleContent
-By default, the scraper does not return the article content, as this would require [Puppeteer](https://pptr.dev/) to navigate to each individual article in the results (increasing execution time significantly). If you would like to enable this behaviour, and receive the content of each article, simply pass `getArticleContent: true,` in the config. This will add two fields to each article in the output: `content` and `favicon`.
+By default, the scraper does not return the article content, as this would require [Puppeteer](https://pptr.dev/) to navigate to each individual article in the results (increasing execution time significantly). If you would like to enable this behaviour, and receive the content of each article, simply pass `getArticleContent: true,` in the config. This adds the article's text and favicon, plus metadata read from the page itself:
 
 ```json
 [
     {
         "title":  "Article title",
         "link":  "https://url-to-website.com/path/to/article",
-        "image":"https://url-to-website.com/path/to/image.jpg",
+        "image": "https://url-to-website.com/path/to/image.jpg",
         "source":  "Name of publication",
-        "time":  "Time/date published (human-readable)", 
-        "content": "The full text content of the article...", 
+        "content": "The full text content of the article...",
         "favicon": "https://url-to-website.com/path/to/favicon.png",
+        "contentStatus": "ok",
+        "wordCount": 812,
+        "authors": ["Jane Doe"],
+        "language": "en-GB",
+        "excerpt": "A one or two sentence summary from the publisher.",
+        "canonicalUrl": "https://url-to-website.com/path/to/article",
+        "publishedAt": "2024-05-13T08:02:22.000Z",
+        "modifiedAt": "2024-05-13T09:15:00.000Z",
+        "keywords": ["Oscars", "Film"],
+        "section": "Entertainment"
     }
 ]
 ```
+
+| Field | Description |
+| --- | --- |
+| `contentStatus` | Why `content` is or isn't there: `ok`, `blocked` (a bot check or captcha), `too_short` (under 100 words, usually a paywall or a non-article page), `unparseable` or `error` (the page failed to load). |
+| `wordCount` | Number of words in `content`. |
+| `authors` | From the page's structured data, author meta tags or byline. Authors the provider already supplied are kept. |
+| `language` | The page's declared language, such as `en` or `en-GB`. |
+| `excerpt` | The publisher's own summary, from the page's description. |
+| `canonicalUrl` | The publisher's preferred URL for the article, useful for deduplicating syndicated copies. |
+| `publishedAt`, `modifiedAt` | Publish and last-updated times as ISO strings, as declared by the publisher. These are usually more precise than `datetime`, and `modifiedAt` tells you if a story changed after it went out. |
+| `keywords`, `section` | Topic tags and the section the publisher filed the article under. |
+| `image` | The article's lead image, when the result didn't already have one. |
+
+Any of these can be empty when a page doesn't publish them.
 
 This is the only feature that needs a headless browser. Puppeteer is an optional dependency since v3, so install it yourself to use this feature:
 ```bash
 npm install puppeteer
 ```
 
-***PLEASE NOTE:*** Due to the large amount of variable factors to take into account, this feature fails on many websites. All errors are handled gracefully and wil return an empty string as the content. Please ensure you handle such outcomes in your application.
+***PLEASE NOTE:*** Due to the large amount of variable factors to take into account, this feature fails on many websites. All errors are handled gracefully and will return an empty string as the content, with `contentStatus` saying why. Please ensure you handle such outcomes in your application.
 
 Defaults to `false`
 

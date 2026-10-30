@@ -14,6 +14,7 @@ import getPrettyUrl from './getPrettyUrl';
 import mapLimit from './mapLimit';
 import fetchWithRetry from './fetchWithRetry';
 import getArticleContent from './getArticleContent';
+import enrichArticles from './enrichArticles';
 import fetchThirdParty, { isSupportedSource } from './providers';
 const USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36';
 const PRETTY_URL_CONCURRENCY = 5;
@@ -62,12 +63,15 @@ const googleNewsScraper = (userConfig) => __awaiter(void 0, void 0, void 0, func
     const sources = !(thirdParty === null || thirdParty === void 0 ? void 0 : thirdParty.apikey)
         ? [scraper]
         : thirdParty.primary === false ? [scraper, provider] : [provider, scraper];
+    const query = config.searchTerm || config.baseUrl || 'https://news.google.com/';
+    const retrievedAt = new Date().toISOString();
     let results = [];
     for (const [i, [name, fetchArticles]] of sources.entries()) {
         try {
             results = (yield fetchArticles())
                 .slice(0, Math.max(0, config.limit))
                 .map(article => (Object.assign(Object.assign({}, article), { provider: name })));
+            results = enrichArticles(results, { query, retrievedAt });
             break;
         }
         catch (error) {
