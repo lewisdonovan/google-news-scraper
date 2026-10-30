@@ -32,7 +32,7 @@ export const thirdPartyFromEnv = (env = process.env) => {
 };
 
 // Drop fields that are always empty or duplicated so agents get compact results
-const toResult = ({ title, link, source, sourceUrl, datetime }) => ({ title, link, source, sourceUrl, datetime });
+const toResult = ({ position, title, link, source, sourceUrl, domain, datetime }) => ({ position, title, link, source, sourceUrl, domain, datetime });
 
 export const searchNews = async ({ query, timeframe = '7d', language, country, limit = 20 }, scrape = googleNewsScraper, env = process.env) => {
   const articles = await scrape({

@@ -35,6 +35,27 @@ describe('googleNewsScraper', () => {
     expect(new Date(articles[0].datetime).getTime()).to.be.greaterThan(0)
   })
 
+  it('adds position, id, domain, query and retrievedAt to every article', async () => {
+    mockGoogle()
+    const before = Date.now()
+    const articles = await gns({ searchTerm: 'tesla', logLevel: 'none' })
+    expect(articles.map(a => a.position)).to.eql([1, 2])
+    expect(articles[0].id).to.match(/^[0-9a-f]{16}$/)
+    expect(articles[0].domain).to.equal('reuters.com')
+    expect(articles[1].domain).to.equal('cnbc.com')
+    expect(articles[0].authors).to.eql([])
+    expect(articles[0].query).to.equal('tesla')
+    expect(new Date(articles[0].retrievedAt).getTime()).to.not.be.below(before)
+    expect(articles[1].retrievedAt).to.equal(articles[0].retrievedAt)
+  })
+
+  it('uses the page url as the query for topics and top stories', async () => {
+    mockGoogle()
+    const baseUrl = 'https://news.google.com/topics/ABC'
+    expect((await gns({ baseUrl, prettyURLs: false, logLevel: 'none' }))[0].query).to.equal(baseUrl)
+    expect((await gns({ prettyURLs: false, logLevel: 'none' }))[0].query).to.equal('https://news.google.com/')
+  })
+
   it('keeps Google links when prettyURLs is false', async () => {
     mockGoogle()
     const articles = await gns({ searchTerm: 'tesla', prettyURLs: false, logLevel: 'none' })
@@ -92,6 +113,9 @@ describe('googleNewsScraper', () => {
       expect(articles[0].source).to.equal('Reuters')
       expect(articles[0].rawResult).to.eql(searchResponse.news_results[0])
       expect(articles[0].provider).to.equal('serpapi')
+      expect(articles.map(a => a.position)).to.eql([1, 2, 3, 4])
+      expect(articles[0].domain).to.equal('reuters.com')
+      expect(articles[0].authors).to.eql(['Jane Doe'])
       expect(calledGoogle()).to.be(false)
       const url = new URL(global.fetch.mock.calls[0][0])
       expect(url.searchParams.get('api_key')).to.equal('KEY')

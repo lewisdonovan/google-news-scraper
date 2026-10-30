@@ -5,6 +5,7 @@ import getPrettyUrl from './getPrettyUrl';
 import mapLimit from './mapLimit';
 import fetchWithRetry from './fetchWithRetry';
 import getArticleContent from './getArticleContent';
+import enrichArticles from './enrichArticles';
 import fetchThirdParty, { isSupportedSource } from './providers';
 import winston from 'winston';
 import {
@@ -76,12 +77,16 @@ const googleNewsScraper = async (userConfig: GNSUserConfig): Promise<Articles> =
     ? [scraper]
     : thirdParty.primary === false ? [scraper, provider] : [provider, scraper];
 
+  const query = config.searchTerm || config.baseUrl || 'https://news.google.com/';
+  const retrievedAt = new Date().toISOString();
+
   let results: Articles = [];
   for (const [i, [name, fetchArticles]] of sources.entries()) {
     try {
       results = (await fetchArticles())
         .slice(0, Math.max(0, config.limit))
         .map(article => ({ ...article, provider: name }));
+      results = enrichArticles(results, { query, retrievedAt });
       break;
     } catch (error) {
       const fallingBack = i < sources.length - 1;

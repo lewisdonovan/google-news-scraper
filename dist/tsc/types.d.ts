@@ -42,6 +42,7 @@ export type GNSConfig = SearchParams & {
     limit: number;
     third_party?: ThirdPartyConfig;
 };
+export type ContentStatus = 'ok' | 'blocked' | 'too_short' | 'unparseable' | 'error';
 export type Article = {
     title: string;
     link: string;
@@ -54,6 +55,21 @@ export type Article = {
     favicon?: string;
     sourceUrl?: string;
     provider?: Provider;
+    position?: number;
+    id?: string;
+    domain?: string;
+    authors?: string[];
+    query?: string;
+    retrievedAt?: string;
+    contentStatus?: ContentStatus;
+    wordCount?: number;
+    language?: string;
+    excerpt?: string;
+    canonicalUrl?: string;
+    publishedAt?: string;
+    modifiedAt?: string;
+    keywords?: string[];
+    section?: string;
     rawResult?: Record<string, unknown>;
 };
 export type Articles = Article[];

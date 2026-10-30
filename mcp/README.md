@@ -12,7 +12,7 @@ It's built on [google-news-scraper](https://github.com/lewisdonovan/google-news-
 | `top_stories` | The current top stories for a country and language, or the stories on a Google News topic page. |
 | `get_article_text` | Fetch an article URL and return its readable body text, title, byline and publish time. |
 
-Each article comes back as `{ title, link, source, sourceUrl, datetime }`.
+Each article comes back as `{ position, title, link, source, sourceUrl, domain, datetime }`.
 
 ## Setup
 

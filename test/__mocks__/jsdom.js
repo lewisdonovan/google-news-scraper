@@ -12,4 +12,8 @@ class JSDOM {
   reconfigure() {}
 }
 
-module.exports = { JSDOM }
+class VirtualConsole {
+  on() { return this }
+}
+
+module.exports = { JSDOM, VirtualConsole }

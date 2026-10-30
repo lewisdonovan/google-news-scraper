@@ -5,6 +5,7 @@ import { searchNews, topStories, extractArticle, getArticleText, thirdPartyFromE
 const article = {
   title: 'Headline', link: 'https://example.com/a', image: '', source: 'Example',
   sourceUrl: 'https://example.com', datetime: '2026-10-14T09:00:00.000Z', time: '3 hours ago', articleType: 'regular',
+  position: 1, id: 'abc123', domain: 'example.com', authors: [], query: 'OpenAI', retrievedAt: '2026-10-14T12:00:00.000Z',
 };
 
 const recordingScraper = () => {
@@ -20,8 +21,8 @@ test('searchNews passes the query, timeframe and locale to the scraper and trims
     logLevel: 'none', searchTerm: 'OpenAI', timeframe: '1d', limit: 5, queryVars: { hl: 'en-GB', gl: 'GB' },
   });
   assert.deepEqual(results, [{
-    title: 'Headline', link: 'https://example.com/a', source: 'Example',
-    sourceUrl: 'https://example.com', datetime: '2026-10-14T09:00:00.000Z',
+    position: 1, title: 'Headline', link: 'https://example.com/a', source: 'Example',
+    sourceUrl: 'https://example.com', domain: 'example.com', datetime: '2026-10-14T09:00:00.000Z',
   }]);
 });
 

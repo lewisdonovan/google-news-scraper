@@ -43,6 +43,10 @@ export const buildParams = (config: GNSConfig): Record<string, string> => {
   return params;
 }
 
+const authorsOf = (result: Result): string[] =>
+  [...(result.source?.authors ?? []), result.author?.name]
+    .filter((name): name is string => typeof name === 'string' && name.trim() !== '');
+
 const toArticle = (result: Result, now: Date): Article => {
   const published = new Date(result.iso_date);
   const valid = !isNaN(published.getTime());
@@ -59,6 +63,7 @@ const toArticle = (result: Result, now: Date): Article => {
     time: valid ? timeAgo(published, now) : '',
     articleType: 'regular',
     ...(result.source?.icon ? { favicon: result.source.icon } : {}),
+    authors: authorsOf(result),
     rawResult: result,
   };
 }

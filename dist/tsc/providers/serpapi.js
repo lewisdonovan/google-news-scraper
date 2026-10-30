@@ -57,6 +57,11 @@ export const buildParams = (config) => {
     params.api_key = config.third_party.apikey;
     return params;
 };
+const authorsOf = (result) => {
+    var _a, _b, _c;
+    return [...((_b = (_a = result.source) === null || _a === void 0 ? void 0 : _a.authors) !== null && _b !== void 0 ? _b : []), (_c = result.author) === null || _c === void 0 ? void 0 : _c.name]
+        .filter((name) => typeof name === 'string' && name.trim() !== '');
+};
 const toArticle = (result, now) => {
     var _a, _b, _c, _d, _e, _f, _g, _h;
     const published = new Date(result.iso_date);
@@ -66,7 +71,7 @@ const toArticle = (result, now) => {
         sourceUrl = new URL(result.link).origin;
     }
     catch (_j) { }
-    return Object.assign(Object.assign({ title: (_a = result.title) !== null && _a !== void 0 ? _a : '', link: (_b = result.link) !== null && _b !== void 0 ? _b : '', image: (_c = result.thumbnail) !== null && _c !== void 0 ? _c : '', source: (_g = (_e = (_d = result.source) === null || _d === void 0 ? void 0 : _d.name) !== null && _e !== void 0 ? _e : (_f = result.author) === null || _f === void 0 ? void 0 : _f.name) !== null && _g !== void 0 ? _g : '', sourceUrl, datetime: valid ? published.toISOString() : '', time: valid ? timeAgo(published, now) : '', articleType: 'regular' }, (((_h = result.source) === null || _h === void 0 ? void 0 : _h.icon) ? { favicon: result.source.icon } : {})), { rawResult: result });
+    return Object.assign(Object.assign({ title: (_a = result.title) !== null && _a !== void 0 ? _a : '', link: (_b = result.link) !== null && _b !== void 0 ? _b : '', image: (_c = result.thumbnail) !== null && _c !== void 0 ? _c : '', source: (_g = (_e = (_d = result.source) === null || _d === void 0 ? void 0 : _d.name) !== null && _e !== void 0 ? _e : (_f = result.author) === null || _f === void 0 ? void 0 : _f.name) !== null && _g !== void 0 ? _g : '', sourceUrl, datetime: valid ? published.toISOString() : '', time: valid ? timeAgo(published, now) : '', articleType: 'regular' }, (((_h = result.source) === null || _h === void 0 ? void 0 : _h.icon) ? { favicon: result.source.icon } : {})), { authors: authorsOf(result), rawResult: result });
 };
 // Front pages group articles into story clusters with a highlight and related stories
 // instead of a top-level link, so clusters are flattened into their articles

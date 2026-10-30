@@ -61,6 +61,7 @@ describe('serpapi toArticles', () => {
       time: '1 hour ago',
       articleType: 'regular',
       favicon: 'https://www.reuters.com/favicon.ico',
+      authors: ['Jane Doe'],
       rawResult: searchResponse.news_results[0],
     })
   })
@@ -79,6 +80,8 @@ describe('serpapi toArticles', () => {
     expect(articles[3].source).to.equal('Elon')
     expect(articles[3].datetime).to.equal('')
     expect(articles[3].image).to.equal('')
+    expect(articles[3].authors).to.eql(['Elon'])
+    expect(articles[1].authors).to.eql([])
   })
 
   it('handles a response without results', () => {
