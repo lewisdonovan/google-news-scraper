@@ -14,7 +14,7 @@ import getPrettyUrl from './getPrettyUrl';
 import mapLimit from './mapLimit';
 import fetchWithRetry from './fetchWithRetry';
 import getArticleContent from './getArticleContent';
-import fetchThirdParty, { isSupportedSource } from './providers';
+import fetchThirdParty, { isSupportedSource, SUPPORTED_SOURCES } from './providers';
 const USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36';
 const PRETTY_URL_CONCURRENCY = 5;
 // Throws when Google can't be reached, so a third-party provider can step in
@@ -52,7 +52,7 @@ const googleNewsScraper = (userConfig) => __awaiter(void 0, void 0, void 0, func
     const logger = getLogger(config.logLevel);
     const thirdParty = config.third_party;
     if (thirdParty && !isSupportedSource(thirdParty.source)) {
-        throw new Error(`Unsupported third_party source "${thirdParty.source}". Supported sources: serpapi.`);
+        throw new Error(`Unsupported third_party source "${thirdParty.source}". Supported sources: ${SUPPORTED_SOURCES.join(', ')}.`);
     }
     if (thirdParty && !thirdParty.apikey) {
         logger.warn('third_party has no apikey, so only the scraper will be used');

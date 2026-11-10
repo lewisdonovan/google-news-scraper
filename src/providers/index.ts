@@ -1,10 +1,14 @@
 import winston from "winston";
 import fetchSerpApi from "./serpapi";
+import fetchHasData from "./hasdata";
 import { GNSConfig, Articles, ThirdPartySource } from "../types";
 
 const providers: Record<ThirdPartySource, (config: GNSConfig, logger: winston.Logger) => Promise<Articles>> = {
   serpapi: fetchSerpApi,
+  hasdata: fetchHasData,
 };
+
+export const SUPPORTED_SOURCES = Object.keys(providers) as ThirdPartySource[];
 
 export const isSupportedSource = (source: string): source is ThirdPartySource => (
   Object.prototype.hasOwnProperty.call(providers, source)
