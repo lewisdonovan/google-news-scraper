@@ -19,12 +19,17 @@ const localeVars = ({ language, country }) => {
 
 // An optional third-party news API key lets results keep coming when Google rate-limits this IP.
 // Claude Desktop passes unset optional settings through as an empty string or the raw placeholder.
+const setting = (value) => {
+  const trimmed = value?.trim();
+  return trimmed && !trimmed.startsWith('${') ? trimmed : undefined;
+};
+
 export const thirdPartyFromEnv = (env = process.env) => {
-  const apikey = env.GOOGLE_NEWS_THIRD_PARTY_APIKEY?.trim();
-  if (!apikey || apikey.startsWith('${')) return {};
+  const apikey = setting(env.GOOGLE_NEWS_THIRD_PARTY_APIKEY);
+  if (!apikey) return {};
   return {
     third_party: {
-      source: env.GOOGLE_NEWS_THIRD_PARTY_SOURCE?.trim() || 'serpapi',
+      source: setting(env.GOOGLE_NEWS_THIRD_PARTY_SOURCE)?.toLowerCase() || 'serpapi',
       apikey,
       primary: env.GOOGLE_NEWS_THIRD_PARTY_PRIMARY?.trim().toLowerCase() !== 'false',
     },

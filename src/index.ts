@@ -5,7 +5,7 @@ import getPrettyUrl from './getPrettyUrl';
 import mapLimit from './mapLimit';
 import fetchWithRetry from './fetchWithRetry';
 import getArticleContent from './getArticleContent';
-import fetchThirdParty, { isSupportedSource } from './providers';
+import fetchThirdParty, { isSupportedSource, SUPPORTED_SOURCES } from './providers';
 import winston from 'winston';
 import {
   GNSUserConfig,
@@ -64,7 +64,7 @@ const googleNewsScraper = async (userConfig: GNSUserConfig): Promise<Articles> =
 
   const thirdParty = config.third_party;
   if (thirdParty && !isSupportedSource(thirdParty.source)) {
-    throw new Error(`Unsupported third_party source "${thirdParty.source}". Supported sources: serpapi.`);
+    throw new Error(`Unsupported third_party source "${thirdParty.source}". Supported sources: ${SUPPORTED_SOURCES.join(', ')}.`);
   }
   if (thirdParty && !thirdParty.apikey) {
     logger.warn('third_party has no apikey, so only the scraper will be used');

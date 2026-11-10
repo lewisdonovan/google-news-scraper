@@ -9,7 +9,7 @@ export type SearchParams =
   | { searchTerm: string; baseUrl?: string }
   | { baseUrl: string; searchTerm?: string };
 
-export type ThirdPartySource = 'serpapi';
+export type ThirdPartySource = 'serpapi' | 'hasdata';
 
 // Where an article came from: the built-in scraper or a third-party source
 export type Provider = 'scraper' | ThirdPartySource;

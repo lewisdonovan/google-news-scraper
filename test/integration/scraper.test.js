@@ -1,6 +1,7 @@
 import expect from 'expect.js'
 import { feedXml, articlePage, batchResponse } from '../fixtures/feed.js'
 import { searchResponse, emptyResponse, errorResponse } from '../fixtures/serpapi.js'
+import * as hasdata from '../fixtures/hasdata.js'
 
 jest.mock('puppeteer', () => ({
   __esModule: true,
@@ -11,8 +12,9 @@ const gns = require('../../dist/tsc/index.js').default
 
 const respond = (body, ok = true, status = 200) => ({ ok, status, text: async () => body })
 
-const mockGoogle = ({ feed = feedXml, feedOk = true, serp = searchResponse, serpStatus = 200 } = {}) => {
+const mockGoogle = ({ feed = feedXml, feedOk = true, serp = searchResponse, serpStatus = 200, hd = hasdata.searchResponse, hdStatus = 200 } = {}) => {
   global.fetch = jest.fn(async (url) => {
+    if (url.startsWith('https://api.hasdata.com/')) return respond(JSON.stringify(hd), hdStatus < 400, hdStatus)
     if (url.startsWith('https://serpapi.com/')) return respond(JSON.stringify(serp), serpStatus < 400, serpStatus)
     if (url.includes('batchexecute')) return respond(batchResponse('https://publisher.example/story'))
     if (url.includes('/rss/articles/')) return respond(articlePage('SIG', '1791993031'))
@@ -146,6 +148,47 @@ describe('googleNewsScraper', () => {
       let error
       try { await gns({ searchTerm: 'tesla', third_party: { source: 'nope', apikey: 'KEY' }, logLevel: 'none' }) } catch (e) { error = e }
       expect(error.message).to.contain('Unsupported third_party source')
+    })
+  })
+
+  describe('with HasData as the provider', () => {
+    const third_party = { source: 'hasdata', apikey: 'KEY' }
+    const calledGoogle = () => global.fetch.mock.calls.some(([url]) => url.includes('news.google.com'))
+
+    it('sends the key as a header and maps the results', async () => {
+      mockGoogle()
+      const articles = await gns({ searchTerm: 'tesla', queryVars: { hl: 'en-US', gl: 'US' }, third_party, logLevel: 'none' })
+      expect(articles).to.have.length(3)
+      expect(articles[0].provider).to.equal('hasdata')
+      expect(articles[0].rawResult).to.eql(hasdata.searchResponse.newsResults[0])
+      expect(calledGoogle()).to.be(false)
+      const [requested, init] = global.fetch.mock.calls[0]
+      const url = new URL(requested)
+      expect(url.origin + url.pathname).to.equal('https://api.hasdata.com/scrape/google/news')
+      expect(url.searchParams.get('q')).to.equal('tesla when:7d')
+      expect(url.searchParams.get('hl')).to.equal('en')
+      expect(url.searchParams.get('gl')).to.equal('us')
+      expect(url.searchParams.has('api_key')).to.be(false)
+      expect(init.headers['x-api-key']).to.equal('KEY')
+    })
+
+    it('treats an empty search as a result, not a failure', async () => {
+      mockGoogle({ hd: hasdata.emptyResponse })
+      expect(await gns({ searchTerm: 'tesla', third_party, logLevel: 'none' })).to.have.length(0)
+      expect(calledGoogle()).to.be(false)
+    })
+
+    it('falls back to the scraper on a validation error', async () => {
+      mockGoogle({ hd: hasdata.validationError, hdStatus: 422 })
+      const articles = await gns({ searchTerm: 'tesla', prettyURLs: false, third_party, logLevel: 'none' })
+      expect(articles).to.have.length(2)
+      expect(articles[0].provider).to.equal('scraper')
+    })
+
+    it('falls back to the scraper when HasData reports an error', async () => {
+      mockGoogle({ hd: hasdata.errorResponse, hdStatus: 400 })
+      const articles = await gns({ searchTerm: 'tesla', prettyURLs: false, third_party, logLevel: 'none' })
+      expect(articles[0].provider).to.equal('scraper')
     })
   })
 })

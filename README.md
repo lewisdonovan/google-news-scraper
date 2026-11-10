@@ -104,7 +104,7 @@ The output is an array of JSON objects, with each article following the structur
 ]
 ```
 
-`provider` says where the article came from: `"scraper"`, or the source name (such as `"serpapi"`) when it was fetched through [third_party](#third_party).
+`provider` says where the article came from: `"scraper"`, or the source name (`"serpapi"` or `"hasdata"`) when it was fetched through [third_party](#third_party).
 
 `image` is always an empty string, because Google News feeds don't include thumbnails. It's kept so code written for v2 doesn't break.
 
@@ -205,7 +205,10 @@ The total number of articles that you would like to be returned. Google News fee
 Defaults to `99` 
 
 #### third_party
-Optionally fetch results from a third-party news API instead of, or as a backup to, the scraper. This is handy when Google rate-limits your server's IP, which is common on cloud and datacenter hosts. The only source supported today is [SerpApi's Google News API](https://serpapi.com/google-news-api), which needs a SerpApi API key.
+Optionally fetch results from a third-party news API instead of, or as a backup to, the scraper. This is handy when Google rate-limits your server's IP, which is common on cloud and datacenter hosts. Two sources are supported, each needing an API key from that provider:
+
+* `"serpapi"`: [SerpApi's Google News API](https://serpapi.com/google-news-api)
+* `"hasdata"`: [HasData's Google News API](https://docs.hasdata.com/apis/google-serp/news)
 
 ```javascript
 const articles = await googleNewsScraper({
@@ -219,12 +222,12 @@ const articles = await googleNewsScraper({
 });
 ```
 
-* `source`: which provider to use. Currently `"serpapi"`.
+* `source`: which provider to use, `"serpapi"` or `"hasdata"`.
 * `apikey`: your key for that provider. Without one, `third_party` is ignored and only the scraper runs.
 * `primary`: when `true`, the provider is called first and the scraper is only used if the provider fails. When `false`, the scraper runs first and the provider is only called if Google can't be reached or responds with an error. An empty set of results is not a failure, so it won't trigger the other one. Defaults to `true`.
 * `config`: any parameters from the provider's docs, sent as-is. `searchTerm`, `timeframe`, `baseUrl` (topic, section, publication and story pages) and the `hl`/`gl` query vars are translated for you, and anything in `config` wins over them.
 
-Results from a provider come back in the usual [output](#output-) shape, with `limit` and `getArticleContent` applied as normal. Because provider links already point at the publisher, `prettyURLs` isn't needed. Their `provider` is the source name, so you can tell when a fallback kicked in. Each article also gets a `rawResult` object holding the provider's original, unedited result, in case it has something the usual shape doesn't. SerpApi results usually include a thumbnail in `image` and the publisher's icon in `favicon` too.
+Results from a provider come back in the usual [output](#output-) shape, with `limit` and `getArticleContent` applied as normal. Because provider links already point at the publisher, `prettyURLs` isn't needed. Their `provider` is the source name, so you can tell when a fallback kicked in. Each article also gets a `rawResult` object holding the provider's original, unedited result, in case it has something the usual shape doesn't. SerpApi and HasData results usually include a thumbnail in `image` and the publisher's icon in `favicon` too. HasData only accepts two-letter languages plus a few regional ones such as `zh-TW` and `pt-BR`, so an `hl` like `en-GB` is sent to it as `en`.
 
 Defaults to `undefined`
 
