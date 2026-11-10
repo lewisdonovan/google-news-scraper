@@ -17,8 +17,13 @@
       "transport": { "type": "stdio" },
       "environmentVariables": [
         {
+          "name": "GOOGLE_NEWS_THIRD_PARTY_SOURCE",
+          "description": "Which news API the key is for: \"serpapi\" (default) or \"hasdata\"",
+          "isRequired": false
+        },
+        {
           "name": "GOOGLE_NEWS_THIRD_PARTY_APIKEY",
-          "description": "Optional SerpApi API key, used when Google rate-limits the scraper or instead of it",
+          "description": "Optional SerpApi or HasData API key, used when Google rate-limits the scraper or instead of it",
           "isSecret": true,
           "isRequired": false
         },

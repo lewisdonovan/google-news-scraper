@@ -55,12 +55,13 @@ code --add-mcp '{"name":"google-news","command":"npx","args":["-y","google-news-
 
 ## Optional: a fallback when Google blocks you
 
-Google rate-limits busy IPs, which is common on cloud servers. If you have a [SerpApi](https://serpapi.com/google-news-api) key, the server can fetch results through SerpApi's Google News API instead. Set these environment variables in your client's MCP config:
+Google rate-limits busy IPs, which is common on cloud servers. If you have a [SerpApi](https://serpapi.com/google-news-api) or [HasData](https://docs.hasdata.com/apis/google-serp/news) key, the server can fetch results through their Google News API instead. Set these environment variables in your client's MCP config:
 
 | Variable | What it does |
 | --- | --- |
-| `GOOGLE_NEWS_THIRD_PARTY_APIKEY` | Your SerpApi API key. Without it, only the free scraper is used. |
-| `GOOGLE_NEWS_THIRD_PARTY_PRIMARY` | `true` (default) calls SerpApi first and scrapes only if it fails. `false` scrapes first and calls SerpApi only if Google can't be reached. |
+| `GOOGLE_NEWS_THIRD_PARTY_APIKEY` | Your API key. Without it, only the free scraper is used. |
+| `GOOGLE_NEWS_THIRD_PARTY_SOURCE` | Which provider the key is for: `serpapi` (default) or `hasdata`. |
+| `GOOGLE_NEWS_THIRD_PARTY_PRIMARY` | `true` (default) calls the provider first and scrapes only if it fails. `false` scrapes first and calls the provider only if Google can't be reached. |
 
 ```json
 {
@@ -68,13 +69,13 @@ Google rate-limits busy IPs, which is common on cloud servers. If you have a [Se
     "google-news": {
       "command": "npx",
       "args": ["-y", "google-news-scraper-mcp"],
-      "env": { "GOOGLE_NEWS_THIRD_PARTY_APIKEY": "your-key", "GOOGLE_NEWS_THIRD_PARTY_PRIMARY": "false" }
+      "env": { "GOOGLE_NEWS_THIRD_PARTY_APIKEY": "your-key", "GOOGLE_NEWS_THIRD_PARTY_SOURCE": "hasdata", "GOOGLE_NEWS_THIRD_PARTY_PRIMARY": "false" }
     }
   }
 }
 ```
 
-In Claude Desktop, enter the key in the extension's settings instead. Each SerpApi call uses one of your SerpApi searches.
+In Claude Desktop, enter the provider and key in the extension's settings instead. Each call uses your provider's credits, for example one SerpApi search or 10 HasData credits.
 
 ## Example prompts
 
@@ -89,7 +90,7 @@ In Claude Desktop, enter the key in the extension's settings instead. Each SerpA
 
 ## Privacy
 
-The server collects and stores nothing. It sends your queries to Google News, or to SerpApi if you set a key, and fetches the article pages you ask it to read. See the [privacy policy](PRIVACY.md).
+The server collects and stores nothing. It sends your queries to Google News, or to SerpApi or HasData if you set a key, and fetches the article pages you ask it to read. See the [privacy policy](PRIVACY.md).
 
 ## License
 

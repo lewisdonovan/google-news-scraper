@@ -55,6 +55,13 @@ test('thirdPartyFromEnv defaults to serpapi as the primary source', () => {
   assert.equal(thirdPartyFromEnv({ GOOGLE_NEWS_THIRD_PARTY_APIKEY: 'KEY', GOOGLE_NEWS_THIRD_PARTY_PRIMARY: 'false' }).third_party.primary, false);
 });
 
+test('thirdPartyFromEnv reads the source, ignoring an unset Claude Desktop setting', () => {
+  const source = (value) => thirdPartyFromEnv({ GOOGLE_NEWS_THIRD_PARTY_APIKEY: 'KEY', GOOGLE_NEWS_THIRD_PARTY_SOURCE: value }).third_party.source;
+  assert.equal(source(' HasData '), 'hasdata');
+  assert.equal(source(''), 'serpapi');
+  assert.equal(source('${user_config.third_party_source}'), 'serpapi');
+});
+
 test('searchNews and topStories pass the third-party config to the scraper', async () => {
   const { calls, scrape } = recordingScraper();
   const env = { GOOGLE_NEWS_THIRD_PARTY_APIKEY: 'KEY', GOOGLE_NEWS_THIRD_PARTY_PRIMARY: 'false' };
