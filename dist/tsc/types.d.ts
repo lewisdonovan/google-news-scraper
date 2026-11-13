@@ -10,7 +10,7 @@ export type SearchParams = {
     baseUrl: string;
     searchTerm?: string;
 };
-export type ThirdPartySource = 'serpapi';
+export type ThirdPartySource = 'serpapi' | 'serpbase';
 export type Provider = 'scraper' | ThirdPartySource;
 export type ThirdPartyConfig = {
     source: ThirdPartySource;

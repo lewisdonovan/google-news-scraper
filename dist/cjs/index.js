@@ -125,7 +125,7 @@ const parseFeed = (xml, now = new Date()) => {
     }).get();
 };
 
-var __awaiter$5 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+var __awaiter$6 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -138,7 +138,7 @@ const RETRYABLE_STATUSES = [429, 500, 502, 503, 504];
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 // Google intermittently answers with 503/429 when an IP sends a burst of requests,
 // so transient failures are retried with exponential backoff before giving up
-const fetchWithRetry = (url_1, ...args_1) => __awaiter$5(void 0, [url_1, ...args_1], void 0, function* (url, init = {}, { attempts = 3, baseDelayMs = 1000, timeoutMs = 30000 } = {}) {
+const fetchWithRetry = (url_1, ...args_1) => __awaiter$6(void 0, [url_1, ...args_1], void 0, function* (url, init = {}, { attempts = 3, baseDelayMs = 1000, timeoutMs = 30000 } = {}) {
     var _a, _b;
     for (let attempt = 1;; attempt++) {
         const isLast = attempt >= attempts;
@@ -157,7 +157,7 @@ const fetchWithRetry = (url_1, ...args_1) => __awaiter$5(void 0, [url_1, ...args
     }
 });
 
-var __awaiter$4 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+var __awaiter$5 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -182,7 +182,7 @@ const decodeLegacyId = (id) => {
 };
 // Newer ids are opaque: Google resolves them through its own batchexecute endpoint,
 // which needs a signature and timestamp scraped from the article's redirect page
-const decodeWithGoogle = (id) => __awaiter$4(void 0, void 0, void 0, function* () {
+const decodeWithGoogle = (id) => __awaiter$5(void 0, void 0, void 0, function* () {
     var _a, _b;
     const page = yield fetchWithRetry(`https://news.google.com/rss/articles/${id}`, {
         headers: { 'User-Agent': USER_AGENT$1 },
@@ -207,7 +207,7 @@ const decodeWithGoogle = (id) => __awaiter$4(void 0, void 0, void 0, function* (
     const result = JSON.parse(json[0][2]);
     return typeof (result === null || result === void 0 ? void 0 : result[1]) === 'string' ? result[1] : null;
 });
-const getPrettyUrl = (googleUrl, logger) => __awaiter$4(void 0, void 0, void 0, function* () {
+const getPrettyUrl = (googleUrl, logger) => __awaiter$5(void 0, void 0, void 0, function* () {
     var _a;
     const id = getArticleId(googleUrl);
     if (!id)
@@ -221,7 +221,7 @@ const getPrettyUrl = (googleUrl, logger) => __awaiter$4(void 0, void 0, void 0, 
     }
 });
 
-var __awaiter$3 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+var __awaiter$4 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -231,10 +231,10 @@ var __awaiter$3 = (undefined && undefined.__awaiter) || function (thisArg, _argu
     });
 };
 // Like Promise.all over items.map(fn), but with at most `limit` calls in flight
-const mapLimit = (items, limit, fn) => __awaiter$3(void 0, void 0, void 0, function* () {
+const mapLimit = (items, limit, fn) => __awaiter$4(void 0, void 0, void 0, function* () {
     const results = new Array(items.length);
     let next = 0;
-    const worker = () => __awaiter$3(void 0, void 0, void 0, function* () {
+    const worker = () => __awaiter$4(void 0, void 0, void 0, function* () {
         while (next < items.length) {
             const index = next++;
             results[index] = yield fn(items[index]);
@@ -3244,7 +3244,7 @@ const cleanText = (text, filterWords) => text
     .filter(line => !filterWords.some(word => line.toLowerCase().includes(word)))
     .join('\n');
 
-var __awaiter$2 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+var __awaiter$3 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -3259,7 +3259,7 @@ const verifyMessages = [
     "i'm not a robot",
     "recaptcha"
 ];
-const getArticleContent = (_a) => __awaiter$2(void 0, [_a], void 0, function* ({ articles, browser, filterWords, logger }) {
+const getArticleContent = (_a) => __awaiter$3(void 0, [_a], void 0, function* ({ articles, browser, filterWords, logger }) {
     try {
         const processedArticlesPromises = articles.map(article => extractArticleContentAndFavicon({ article, browser, filterWords, logger }));
         const processedArticles = yield Promise.all(processedArticlesPromises);
@@ -3270,7 +3270,7 @@ const getArticleContent = (_a) => __awaiter$2(void 0, [_a], void 0, function* ({
         return articles;
     }
 });
-const extractArticleContentAndFavicon = (_a) => __awaiter$2(void 0, [_a], void 0, function* ({ article, browser, filterWords, logger }) {
+const extractArticleContentAndFavicon = (_a) => __awaiter$3(void 0, [_a], void 0, function* ({ article, browser, filterWords, logger }) {
     var _b;
     const page = yield browser.newPage();
     try {
@@ -3311,7 +3311,7 @@ const extractArticleContentAndFavicon = (_a) => __awaiter$2(void 0, [_a], void 0
     }
 });
 
-var __awaiter$1 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+var __awaiter$2 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -3331,7 +3331,7 @@ var __rest = (undefined && undefined.__rest) || function (s, e) {
         }
     return t;
 };
-const ENDPOINT = 'https://serpapi.com/search.json';
+const ENDPOINT$1 = 'https://serpapi.com/search.json';
 // news.google.com page paths map onto SerpApi tokens, e.g.
 // /topics/ABC/sections/DEF -> topic_token=ABC&section_token=DEF
 const PATH_TOKENS = {
@@ -3368,7 +3368,7 @@ const buildParams = (config) => {
     params.api_key = config.third_party.apikey;
     return params;
 };
-const toArticle = (result, now) => {
+const toArticle$1 = (result, now) => {
     var _a, _b, _c, _d, _e, _f, _g, _h;
     const published = new Date(result.iso_date);
     const valid = !isNaN(published.getTime());
@@ -3381,7 +3381,7 @@ const toArticle = (result, now) => {
 };
 // Front pages group articles into story clusters with a highlight and related stories
 // instead of a top-level link, so clusters are flattened into their articles
-const toArticles = (json, now = new Date()) => {
+const toArticles$1 = (json, now = new Date()) => {
     var _a;
     return (((_a = json.news_results) !== null && _a !== void 0 ? _a : [])
         .flatMap((result) => {
@@ -3391,14 +3391,14 @@ const toArticles = (json, now = new Date()) => {
             : [result.highlight, ...((_a = result.stories) !== null && _a !== void 0 ? _a : [])].filter(Boolean);
     })
         .filter((result) => result.title && result.link)
-        .map((result) => toArticle(result, now)));
+        .map((result) => toArticle$1(result, now)));
 };
-const fetchSerpApi = (config, logger) => __awaiter$1(void 0, void 0, void 0, function* () {
+const fetchSerpApi = (config, logger) => __awaiter$2(void 0, void 0, void 0, function* () {
     var _a, _b;
     const params = buildParams(config);
     const { api_key } = params, loggable = __rest(params, ["api_key"]);
     logger.info(`📰 FETCHING NEWS FROM SERPAPI: ${JSON.stringify(loggable)}`);
-    const response = yield fetchWithRetry(`${ENDPOINT}?${new URLSearchParams(params)}`);
+    const response = yield fetchWithRetry(`${ENDPOINT$1}?${new URLSearchParams(params)}`);
     let json = {};
     try {
         json = JSON.parse(yield response.text());
@@ -3408,12 +3408,100 @@ const fetchSerpApi = (config, logger) => __awaiter$1(void 0, void 0, void 0, fun
     if (!response.ok || (json.error && ((_a = json.search_metadata) === null || _a === void 0 ? void 0 : _a.status) !== 'Success')) {
         throw new Error(`SerpApi responded with ${response.status}: ${(_b = json.error) !== null && _b !== void 0 ? _b : 'no error message'}`);
     }
+    return toArticles$1(json);
+});
+
+var __awaiter$1 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+const ENDPOINT = 'https://api.serpbase.dev/google/news/search';
+// SerpBase takes a plain query string, so Google News page paths (topic, section,
+// publication and story tokens) have no equivalent: those requests are handed to the scraper
+const buildRequest = (config) => {
+    var _a, _b, _c;
+    const body = { q: config.searchTerm };
+    // SerpBase expects both locale params lowercase, and takes no other Google query vars
+    const { hl, gl } = (_a = config.queryVars) !== null && _a !== void 0 ? _a : {};
+    if (hl)
+        body.hl = hl.toLowerCase();
+    if (gl)
+        body.gl = gl.toLowerCase();
+    for (const [key, value] of Object.entries((_c = (_b = config.third_party) === null || _b === void 0 ? void 0 : _b.config) !== null && _c !== void 0 ? _c : {})) {
+        if (value !== undefined && value !== null)
+            body[key] = value;
+    }
+    return body;
+};
+const toArticle = (result) => {
+    var _a, _b, _c, _d, _e;
+    // source_url points at a google.com/goto redirect, so the publisher's origin comes from the link
+    let sourceUrl = '';
+    try {
+        sourceUrl = new URL(result.link).origin;
+    }
+    catch (_f) { }
+    // Thumbnails arrive as base64 data URIs, which would bloat every result; only keep real urls
+    const image = typeof result.thumbnail === 'string' && /^https?:\/\//.test(result.thumbnail) ? result.thumbnail : '';
+    return {
+        title: (_a = result.title) !== null && _a !== void 0 ? _a : '',
+        link: (_b = result.link) !== null && _b !== void 0 ? _b : '',
+        image,
+        source: (_c = result.source) !== null && _c !== void 0 ? _c : '',
+        sourceUrl,
+        // The API only reports a relative age ("10 hours ago"), so there's no date to normalise
+        datetime: '',
+        time: (_e = (_d = result.time) !== null && _d !== void 0 ? _d : result.published_at) !== null && _e !== void 0 ? _e : '',
+        articleType: 'regular',
+        rawResult: result,
+    };
+};
+// A page without stories sometimes comes back as site navigation (Sign in, Maps, Flights)
+const isStory = (result) => (Boolean((result === null || result === void 0 ? void 0 : result.title) && (result === null || result === void 0 ? void 0 : result.link) && (result === null || result === void 0 ? void 0 : result.source)));
+const toArticles = (json) => {
+    var _a;
+    return (((_a = json.news) !== null && _a !== void 0 ? _a : [])
+        .filter(isStory)
+        .map((result) => toArticle(result)));
+};
+const fetchSerpBase = (config, logger) => __awaiter$1(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    if (!config.searchTerm) {
+        throw new Error('SerpBase only searches by term, so topic and publication pages fall back to the scraper');
+    }
+    const body = buildRequest(config);
+    logger.info(`📰 FETCHING NEWS FROM SERPBASE: ${JSON.stringify(body)}`);
+    const response = yield fetchWithRetry(ENDPOINT, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-API-Key': config.third_party.apikey,
+        },
+        body: JSON.stringify(body),
+    });
+    let json = {};
+    try {
+        json = JSON.parse(yield response.text());
+    }
+    catch (_c) { }
+    // Failures (bad key, no credits, upstream error) come back as HTTP 200 with a business
+    // status, so the envelope decides success rather than the status code
+    if (!response.ok || json.status !== 0) {
+        throw new Error(`SerpBase responded with ${response.status} (status ${(_a = json.status) !== null && _a !== void 0 ? _a : 'unknown'}): ${(_b = json.error) !== null && _b !== void 0 ? _b : 'no error message'}`);
+    }
     return toArticles(json);
 });
 
 const providers = {
     serpapi: fetchSerpApi,
+    serpbase: fetchSerpBase,
 };
+const supportedSources = Object.keys(providers);
 const isSupportedSource = (source) => (Object.prototype.hasOwnProperty.call(providers, source));
 const fetchThirdParty = (config, logger) => (providers[config.third_party.source](config, logger));
 
@@ -3463,7 +3551,7 @@ const googleNewsScraper = (userConfig) => __awaiter(void 0, void 0, void 0, func
     const logger = getLogger(config.logLevel);
     const thirdParty = config.third_party;
     if (thirdParty && !isSupportedSource(thirdParty.source)) {
-        throw new Error(`Unsupported third_party source "${thirdParty.source}". Supported sources: serpapi.`);
+        throw new Error(`Unsupported third_party source "${thirdParty.source}". Supported sources: ${supportedSources.join(', ')}.`);
     }
     if (thirdParty && !thirdParty.apikey) {
         logger.warn('third_party has no apikey, so only the scraper will be used');
