@@ -1,0 +1,83 @@
+// Trimmed from a live /google/news/search response
+export const searchResponse = {
+  status: 0,
+  request_id: 'r-4b27fe8a36d9ac303a5da7dd',
+  credits_charged: 1,
+  elapsed_ms: 6125,
+  product_id: 'google_news_search',
+  query: 'tesla',
+  page: 1,
+  search_type: 'news',
+  news: [
+    {
+      display_link: 'www.reuters.com',
+      display_url: 'www.reuters.com',
+      link: 'https://www.reuters.com/business/autos/tesla-deliveries',
+      position: 1,
+      published_at: '1 hour ago',
+      rank: 1,
+      snippet: 'Tesla deliveries beat estimates as demand recovers.',
+      source: 'Reuters',
+      source_url: 'https://www.google.com/goto?url=CAESrAEBxCJF13FVg3DvGlRlOMwt',
+      thumbnail: 'data:image/webp;base64,UklGRuwCAABXRUJQVlA4IOACAAAwEQCdASpcAFwAPyFW',
+      thumbnail_url: 'data:image/webp;base64,UklGRuwCAABXRUJQVlA4IOACAAAwEQCdASpcAFwAPyFW',
+      time: '1 hour ago',
+      title: 'Tesla deliveries beat estimates',
+      url: 'https://www.reuters.com/business/autos/tesla-deliveries',
+    },
+    {
+      display_link: 'www.theverge.com',
+      display_url: 'www.theverge.com',
+      link: 'https://www.theverge.com/tesla-model',
+      position: 2,
+      published_at: '3 days ago',
+      rank: 2,
+      snippet: 'Musk unveils a new model.',
+      source: 'The Verge',
+      source_url: 'https://www.google.com/goto?url=CAESowEBxCJF1z_2bPEyn00uQSNh',
+      thumbnail: 'https://cdn.theverge.com/tesla-model.jpg',
+      thumbnail_url: 'https://cdn.theverge.com/tesla-model.jpg',
+      time: '3 days ago',
+      title: 'Musk unveils new model',
+      url: 'https://www.theverge.com/tesla-model',
+    },
+    {
+      // Site navigation, not a story: no source, no date
+      display_link: 'accounts.google.com',
+      link: 'https://accounts.google.com/ServiceLogin?hl=en-GB',
+      position: 3,
+      rank: 3,
+      title: 'Sign in',
+      url: 'https://accounts.google.com/ServiceLogin?hl=en-GB',
+    },
+    {
+      display_link: 'example.com',
+      link: 'https://example.com/untitled',
+      position: 4,
+      rank: 4,
+      source: 'Example',
+      title: '',
+      url: 'https://example.com/untitled',
+    },
+  ],
+}
+
+export const emptyResponse = {
+  status: 0,
+  request_id: 'r-def456',
+  credits_charged: 1,
+  elapsed_ms: 4210,
+  product_id: 'google_news_search',
+  query: 'nothing at all',
+  page: 1,
+  search_type: 'news',
+  news: [],
+}
+
+export const errorResponse = {
+  status: 1001,
+  credits_charged: 0,
+  elapsed_ms: 0,
+  error: 'invalid API key',
+  request_id: 'r-7235e575ad51f775edf2d942',
+}

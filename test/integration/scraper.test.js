@@ -1,6 +1,11 @@
 import expect from 'expect.js'
 import { feedXml, articlePage, batchResponse } from '../fixtures/feed.js'
 import { searchResponse, emptyResponse, errorResponse } from '../fixtures/serpapi.js'
+import {
+  searchResponse as serpbaseResponse,
+  emptyResponse as serpbaseEmptyResponse,
+  errorResponse as serpbaseErrorResponse,
+} from '../fixtures/serpbase.js'
 
 jest.mock('puppeteer', () => ({
   __esModule: true,
@@ -148,4 +153,61 @@ describe('googleNewsScraper', () => {
       expect(error.message).to.contain('Unsupported third_party source')
     })
   })
+
+  describe('with SerpBase as the third-party provider', () => {
+    const third_party = { source: 'serpbase', apikey: 'KEY' }
+
+    const mockSerpBase = ({ feedOk = true, serpbase = serpbaseResponse } = {}) => {
+      global.fetch = jest.fn(async (url, init = {}) => {
+        if (url === 'https://api.serpbase.dev/google/news/search') {
+          return respond(JSON.stringify(serpbase), true, 200)
+        }
+        if (url.includes('batchexecute')) return respond(batchResponse('https://publisher.example/story'))
+        if (url.includes('/rss/articles/')) return respond(articlePage('SIG', '1791993031'))
+        return respond(feedXml, feedOk, feedOk ? 200 : 404)
+      })
+    }
+
+    const providerCall = () => global.fetch.mock.calls.find(([url]) => url === 'https://api.serpbase.dev/google/news/search')
+    const calledGoogle = () => global.fetch.mock.calls.some(([url]) => url.includes('news.google.com'))
+
+    it('posts the query with the key in the X-API-Key header', async () => {
+      mockSerpBase()
+      const articles = await gns({ searchTerm: 'tesla', third_party, logLevel: 'none' })
+      expect(articles).to.have.length(2)
+      expect(articles[0].provider).to.equal('serpbase')
+      expect(articles[0].source).to.equal('Reuters')
+
+      const [url, init] = providerCall()
+      expect(url).to.equal('https://api.serpbase.dev/google/news/search')
+      expect(init.method).to.equal('POST')
+      expect(init.headers['X-API-Key']).to.equal('KEY')
+      expect(JSON.parse(init.body)).to.eql({ q: 'tesla' })
+      expect(url).to.not.contain('KEY')
+      expect(calledGoogle()).to.be(false)
+    })
+
+    it('falls back to the scraper when the envelope reports an error', async () => {
+      mockSerpBase({ serpbase: serpbaseErrorResponse })
+      const articles = await gns({ searchTerm: 'tesla', prettyURLs: false, third_party, logLevel: 'none' })
+      expect(articles).to.have.length(2)
+      expect(articles[0].provider).to.equal('scraper')
+      expect(calledGoogle()).to.be(true)
+    })
+
+    it('treats an empty news array as a result, not a failure', async () => {
+      mockSerpBase({ serpbase: serpbaseEmptyResponse })
+      expect(await gns({ searchTerm: 'tesla', third_party, logLevel: 'none' })).to.have.length(0)
+      expect(calledGoogle()).to.be(false)
+    })
+
+    it('leaves topic pages to the scraper because SerpBase only searches by term', async () => {
+      mockSerpBase()
+      const articles = await gns({ baseUrl: 'https://news.google.com/topics/TOPIC', prettyURLs: false, third_party, logLevel: 'none' })
+      expect(articles).to.have.length(2)
+      expect(articles[0].provider).to.equal('scraper')
+      expect(providerCall()).to.be(undefined)
+    })
+  })
 })
+

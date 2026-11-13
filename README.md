@@ -205,7 +205,7 @@ The total number of articles that you would like to be returned. Google News fee
 Defaults to `99` 
 
 #### third_party
-Optionally fetch results from a third-party news API instead of, or as a backup to, the scraper. This is handy when Google rate-limits your server's IP, which is common on cloud and datacenter hosts. The only source supported today is [SerpApi's Google News API](https://serpapi.com/google-news-api), which needs a SerpApi API key.
+Optionally fetch results from a third-party news API instead of, or as a backup to, the scraper. This is handy when Google rate-limits your server's IP, which is common on cloud and datacenter hosts. Two sources are supported: [SerpApi's Google News API](https://serpapi.com/google-news-api), and [SerpBase](https://serpbase.dev), whose Google News endpoint returns the same stories as structured JSON behind one `POST` request.
 
 ```javascript
 const articles = await googleNewsScraper({
@@ -217,14 +217,30 @@ const articles = await googleNewsScraper({
         config: { so: 1 },        // optional, passed straight to the third-party API
     },
 });
+
+// Or SerpBase, which needs an API key from https://serpbase.dev/api-keys
+const more = await googleNewsScraper({
+    searchTerm: "The Oscars",
+    third_party: {
+        source: "serpbase",
+        apikey: process.env.SERPBASE_API_KEY,
+        config: { page: 2 },      // optional, one page is 10 articles
+    },
+});
 ```
 
-* `source`: which provider to use. Currently `"serpapi"`.
+* `source`: which provider to use. `"serpapi"` or `"serpbase"`.
 * `apikey`: your key for that provider. Without one, `third_party` is ignored and only the scraper runs.
 * `primary`: when `true`, the provider is called first and the scraper is only used if the provider fails. When `false`, the scraper runs first and the provider is only called if Google can't be reached or responds with an error. An empty set of results is not a failure, so it won't trigger the other one. Defaults to `true`.
 * `config`: any parameters from the provider's docs, sent as-is. `searchTerm`, `timeframe`, `baseUrl` (topic, section, publication and story pages) and the `hl`/`gl` query vars are translated for you, and anything in `config` wins over them.
 
 Results from a provider come back in the usual [output](#output-) shape, with `limit` and `getArticleContent` applied as normal. Because provider links already point at the publisher, `prettyURLs` isn't needed. Their `provider` is the source name, so you can tell when a fallback kicked in. Each article also gets a `rawResult` object holding the provider's original, unedited result, in case it has something the usual shape doesn't. SerpApi results usually include a thumbnail in `image` and the publisher's icon in `favicon` too.
+
+A few differences worth knowing about SerpBase:
+* It searches by term only, so requests for topic, section, publication and story pages are left to the scraper.
+* One request returns 10 articles, and each one is billed as a credit. Pass `config: { page: 2 }` for the next page, or use `limit` to trim the results.
+* It reports a relative age (`"10 hours ago"`) instead of a date, so those articles have it in `time` and an empty `datetime`.
+* Thumbnails come back as base64 data URIs, which would bloat every result, so `image` is empty for SerpBase articles.
 
 Defaults to `undefined`
 
